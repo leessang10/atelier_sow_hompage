@@ -1,0 +1,27 @@
+@import "pretendard/dist/web/static/pretendard.css";
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+    --foreground-rgb: 0, 0, 0;
+    --background-start-rgb: 214, 219, 220;
+    --background-end-rgb: 255, 255, 255;
+    --font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, "SF Pro Display",
+    "SF Pro Text", "Segoe UI", "Apple SD Gothic Neo", "Malgun Gothic", "맑은 고딕",
+    "Noto Sans KR", "Roboto", system-ui, sans-serif;
+}
+
+@media (prefers-color-scheme: dark) {
+    :root {
+        --background: #0a0a0a;
+        --foreground: #ededed;
+    }
+}
+
+body {
+    color: var(--foreground);
+    background: var(--background);
+    font-family: var(--font-family); /* Pretendard를 포함한 폰트 적용 */
+}

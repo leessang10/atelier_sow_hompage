@@ -1,0 +1,66 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+# SOW Project Rules
+
+## 프로젝트 구조
+- `/app`: Next.js 13+ 기반의 메인 애플리케이션 코드
+  - `/projects`: 프로젝트 관련 페이지
+  - `/projectsv2`: 프로젝트 v2 관련 페이지
+  - `/contact`: 연락처 페이지
+  - `/process`: 프로세스 페이지
+  - `/about`: 소개 페이지
+- `/components`: 재사용 가능한 React 컴포넌트
+- `/lib`: 유틸리티 함수 및 공통 로직
+- `/api`: API 엔드포인트
+- `/public`: 정적 파일 (이미지, 폰트 등)
+
+## 기술 스택
+- Framework: Next.js 13+
+- Language: TypeScript
+- Styling: Tailwind CSS
+- Linting: ESLint
+- Package Manager: npm
+
+## 코딩 컨벤션
+1. **타입스크립트**
+   - 모든 새로운 코드는 TypeScript로 작성
+   - 적절한 타입 정의 필수
+   - `any` 타입 사용 지양
+
+2. **컴포넌트**
+   - 함수형 컴포넌트 사용
+   - Props 인터페이스 명확히 정의
+   - 컴포넌트 파일명은 PascalCase
+
+3. **스타일링**
+   - Tailwind CSS 클래스 사용
+   - 커스텀 스타일은 globals.css에 정의
+   - 반응형 디자인 고려
+
+4. **파일 구조**
+   - 페이지는 `/app` 디렉토리에 위치
+   - 공통 컴포넌트는 `/components`에 위치
+   - 유틸리티 함수는 `/lib`에 위치
+
+5. **네이밍**
+   - 변수/함수: camelCase
+   - 컴포넌트/인터페이스: PascalCase
+   - 상수: UPPER_SNAKE_CASE
+
+6. **코드 품질**
+   - ESLint 규칙 준수
+   - 불필요한 콘솔 로그 제거
+   - 주석은 복잡한 로직에만 추가
+
+## Git 규칙
+- 커밋 메시지는 명확하고 간결하게
+- 기능별 브랜치 생성
+- main 브랜치는 항상 배포 가능한 상태 유지
+
+## 배포
+- Vercel을 통한 자동 배포
+- 환경 변수는 .env.development.local에서 관리
+- 프로덕션 배포 전 테스트 필수
