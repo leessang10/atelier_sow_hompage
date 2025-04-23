@@ -4,15 +4,18 @@ applications:
       phases:
         preBuild:
           commands:
-            # SSM에서 환경 변수 가져오기
-            - export NOTION_API_KEY=$(aws ssm get-parameter --name "/amplify/d7odksdubwi9a/main/NOTION_API_KEY" --with-decryption --query "Parameter.Value" --output text)
-            - export NOTION_PROJECT_DATABASE_ID=$(aws ssm get-parameter --name "/amplify/d7odksdubwi9a/main/NOTION_PROJECT_DATABASE_ID" --with-decryption --query "Parameter.Value" --output text)
-            - export NOTION_PRESS_DATABASE_ID=$(aws ssm get-parameter --name "/amplify/d7odksdubwi9a/main/NOTION_PRESS_DATABASE_ID" --with-decryption --query "Parameter.Value" --output text)
-            - export NOTION_CONTACT_DATABASE_ID=$(aws ssm get-parameter --name "/amplify/d7odksdubwi9a/main/NOTION_CONTACT_DATABASE_ID" --with-decryption --query "Parameter.Value" --output text)
-            - echo "NOTION_PROJECT_DATABASE_ID=$NOTION_PROJECT_DATABASE_ID"
-            - echo "NOTION_API_KEY=$NOTION_API_KEY"
-            - echo "NOTION_PRESS_DATABASE_ID=$NOTION_PRESS_DATABASE_ID"
-            - echo "NOTION_CONTACT_DATABASE_ID=$NOTION_CONTACT_DATABASE_ID"
+            # 환경 변수 설정
+            - |
+              cat << EOF > .env.production
+              NOTION_API_KEY=$NOTION_API_KEY
+              NOTION_PROJECT_DATABASE_ID=$NOTION_PROJECT_DATABASE_ID
+              NOTION_PRESS_DATABASE_ID=$NOTION_PRESS_DATABASE_ID
+              NOTION_CONTACT_DATABASE_ID=$NOTION_CONTACT_DATABASE_ID
+              BLOB_READ_WRITE_TOKEN=$BLOB_READ_WRITE_TOKEN
+              GOOGLE_API_KEY=$GOOGLE_API_KEY
+              SMTP_USER=$SMTP_USER
+              SMTP_PASS=$SMTP_PASS
+              EOF
             - npm ci
             - npm cache clean --force
         build:
