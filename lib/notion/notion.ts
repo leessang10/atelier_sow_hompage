@@ -3,6 +3,10 @@ import { Client } from '@notionhq/client';
 import { CONTACT_DATABASE_ID, PRESS_DATABASE_ID, PROJECT_DATABASE_ID } from './const';
 import { parseBlock, parsePress, parseProject } from './notion-utils';
 
+if (!process.env.NOTION_API_KEY) {
+  throw new Error('NOTION_API_KEY is not defined');
+}
+
 // Notion 클라이언트 초기화
 const notion = new Client({
   auth: process.env.NOTION_API_KEY,

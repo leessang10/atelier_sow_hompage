@@ -4,12 +4,13 @@ applications:
       phases:
         preBuild:
           commands:
+            # SSM에서 환경 변수 가져오기
+            - export NOTION_API_KEY=$(aws ssm get-parameter --name "/amplify/d7odksdubwi9a/main/NOTION_API_KEY" --with-decryption --query "Parameter.Value" --output text)
+            - export NOTION_PROJECT_DATABASE_ID=$(aws ssm get-parameter --name "/amplify/d7odksdubwi9a/main/NOTION_PROJECT_DATABASE_ID" --with-decryption --query "Parameter.Value" --output text)
+            - export NOTION_PRESS_DATABASE_ID=$(aws ssm get-parameter --name "/amplify/d7odksdubwi9a/main/NOTION_PRESS_DATABASE_ID" --with-decryption --query "Parameter.Value" --output text)
+            - export NOTION_CONTACT_DATABASE_ID=$(aws ssm get-parameter --name "/amplify/d7odksdubwi9a/main/NOTION_CONTACT_DATABASE_ID" --with-decryption --query "Parameter.Value" --output text)
             - npm ci
             - npm cache clean --force
-            - if [ -z "$NOTION_API_KEY" ]; then echo "NOTION_API_KEY is not set" && exit 1; fi
-            - if [ -z "$NOTION_PROJECT_DATABASE_ID" ]; then echo "NOTION_PROJECT_DATABASE_ID is not set" && exit 1; fi
-            - if [ -z "$NOTION_PRESS_DATABASE_ID" ]; then echo "NOTION_PRESS_DATABASE_ID is not set" && exit 1; fi
-            - if [ -z "$NOTION_CONTACT_DATABASE_ID" ]; then echo "NOTION_CONTACT_DATABASE_ID is not set" && exit 1; fi
         build:
           commands:
             - npm run build
