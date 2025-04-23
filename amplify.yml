@@ -5,6 +5,11 @@ applications:
         preBuild:
           commands:
             - npm ci
+            - npm cache clean --force
+            - if [ -z "$NOTION_API_KEY" ]; then echo "NOTION_API_KEY is not set" && exit 1; fi
+            - if [ -z "$NOTION_PROJECT_DATABASE_ID" ]; then echo "NOTION_PROJECT_DATABASE_ID is not set" && exit 1; fi
+            - if [ -z "$NOTION_PRESS_DATABASE_ID" ]; then echo "NOTION_PRESS_DATABASE_ID is not set" && exit 1; fi
+            - if [ -z "$NOTION_CONTACT_DATABASE_ID" ]; then echo "NOTION_CONTACT_DATABASE_ID is not set" && exit 1; fi
         build:
           commands:
             - npm run build
@@ -16,3 +21,7 @@ applications:
         paths:
           - node_modules/**/*
           - .next/cache/**/*
+          - '$HOME/.npm/**/*'
+      environment:
+        variables:
+          NODE_ENV: production
