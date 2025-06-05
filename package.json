@@ -11,6 +11,7 @@
     "vercel:env:pull": "vercel env pull .env.development.local"
   },
   "dependencies": {
+    "@supabase/supabase-js": "1.13.1",
     "@vercel/blob": "^0.27.0",
     "dayjs": "^1.11.13",
     "framer-motion": "^11.15.0",
