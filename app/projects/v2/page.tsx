@@ -12,6 +12,7 @@ export default async function Projects() {
 
   try {
     projects = await getProjects();
+    console.log(projects);
   } catch (e) {
     console.error('프로젝트를 불러오는 중 오류가 발생했습니다:', e);
     error = e;
@@ -19,7 +20,7 @@ export default async function Projects() {
 
   return (
     <main className="min-h-screen bg-white dark:bg-dark-bg transition-colors">
-      <PageHeader title="프로젝트" description="Architecture + Interior + Branding" />
+      <PageHeader title="" description="" />
       <section className="py-2 px-2">
         {error ? (
           <div className="text-center py-12">

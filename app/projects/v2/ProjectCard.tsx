@@ -1,6 +1,6 @@
+import {Project} from '@/types/project.types';
 import {motion} from 'framer-motion';
 import Image from 'next/image';
-import {Project} from '../../../types/project.types';
 
 interface ProjectCardProps {
   project: Project;
@@ -15,7 +15,7 @@ export default function ProjectCard({ project }: ProjectCardProps) {
   return (
     <motion.div variants={item} className="group relative aspect-[4/3] bg-gray-100 overflow-hidden hover:shadow-lg transition-shadow">
       <Image
-        src={project.mainImage}
+        src={project.main_image}
         alt={project.title}
         fill
         style={{ objectFit: 'cover', objectPosition: 'center' }}

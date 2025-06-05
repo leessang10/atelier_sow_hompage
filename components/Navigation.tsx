@@ -8,7 +8,7 @@ import ThemeToggle from './ThemeToggle';
 
 const menuItems = [
   { href: '/about', text: 'About' },
-  { href: '/projects/v1', text: 'Projects' },
+  { href: '/projects/v2', text: 'Projects' },
   { href: '/press', text: 'Press' },
   { href: '/process', text: 'Process' },
   { href: '/contact', text: 'Contact' },

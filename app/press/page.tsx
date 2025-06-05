@@ -1,8 +1,8 @@
-import {getPressItems} from "@/app/api/data/press";
+import {getPressItems} from "@/api/data/press";
 import {PressItem} from "@/app/press/types";
 import PageHeader from '../../components/PageHeader';
 import PressClient from './PressClient';
- 
+
 // 페이지 동적 설정
 export const revalidate = 10; // 10초마다 재검증
 

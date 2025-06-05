@@ -1,17 +1,40 @@
 'use client';
 
-import {projects} from "@/app/api/data/projects";
+
 import CustomNextButton from '@/components/slider/CustomNextButton';
 import CustomPrevButton from '@/components/slider/CustomPrevButton';
+import {Project} from "@/types/project.types";
 import Image from 'next/image';
-import React, {useRef} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import Slider from 'react-slick';
 import 'slick-carousel/slick/slick.css';
 import 'slick-carousel/slick/slick-theme.css';
 
 export default function Home() {
   const sliderRef = useRef<Slider | null>(null);
+  const [projects, setProjects] = useState<Project[]>([])
+  const [error, setError] = useState<string | null>(null);
 
+
+  // ✅ 클라이언트에서 API 호출
+  useEffect(() => {
+    const fetchProjects = async () => {
+      try {
+        const res = await fetch('/api/projects')
+        const data = await res.json()
+
+        if (res.ok) {
+          setProjects(data)
+        } else {
+          setError(data.error || '불러오기 실패')
+        }
+      } catch (err) {
+        setError('네트워크 오류')
+      }
+    }
+
+    fetchProjects()
+  }, [])
   const settings = {
     dots: false,
     infinite: true,
@@ -29,7 +52,7 @@ export default function Home() {
         <Slider ref={sliderRef} {...settings}>
           {projects.map((project, index) => (
             <div key={index} className="relative h-screen w-screen">
-              <Image src={project.mainImage} alt={project.title} fill style={{ objectFit: 'cover' }} sizes="100vw" />
+              <Image src={project.main_image} alt={project.title} fill style={{ objectFit: 'cover' }} sizes="100vw" />
               <div className="absolute inset-0 flex flex-col justify-center items-center text-center bg-black bg-opacity-40">
                 <h2 className="text-3xl font-bold text-white mb-2">{project.title}</h2>
                 <p className="text-lg text-gray-200">{project.subtitle}</p>
