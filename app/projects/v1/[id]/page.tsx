@@ -1,13 +1,16 @@
-import { getProject } from '@/lib/temp-data';
 import PageHeader from '@/components/PageHeader';
-import ProjectContent from './ProjectContent';
 import Image from 'next/image';
-import { notFound } from 'next/navigation';
-import { BlockContent } from './ProjectContent';
+import {notFound} from 'next/navigation';
+import ProjectContent, {BlockContent} from './ProjectContent';
 
 interface ProjectDetailProps {
   params: Promise<{ id: string }>;
 }
+
+async function getProject(id: string) {
+    return {title: '', subtitle: '', mainImage: '', content:{}};
+}
+
 export default async function ProjectDetail({ params }: ProjectDetailProps) {
   const { id } = await params;
   const project = await getProject(id);

@@ -1,6 +1,6 @@
-import { getPressItem } from '@/lib/temp-data';
+import {getPressItem} from "@/api/data/press";
+import {notFound} from 'next/navigation';
 import PageHeader from '../../../components/PageHeader';
-import { notFound } from 'next/navigation';
 import PressDetailClient from './PressDetailClient';
 // 페이지 동적 설정
 export const revalidate = 10; // 10초마다 재검증
