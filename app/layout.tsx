@@ -17,11 +17,7 @@ const pretendard = localFont({
     variable: "--font-pretendard",
 });
 
-export default function RootLayout({
-                                       children,
-                                   }: Readonly<{
-    children: React.ReactNode;
-}>) {
+export default function RootLayout({children}: Readonly<{children: React.ReactNode}>) {
     return (
         <html lang="ko" suppressHydrationWarning>
         <body className={`${pretendard.className} transition-colors`}>

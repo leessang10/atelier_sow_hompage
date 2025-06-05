@@ -1,6 +1,6 @@
 import {getProjects} from "@/app/api/data/projects";
-import {Project} from "@/app/projects/types";
-import PageHeader from '../../components/PageHeader';
+import {Project} from "@/app/projects/v1/types";
+import PageHeader from '../../../components/PageHeader';
 import ProjectGrid from './ProjectGrid';
 
 // 페이지 동적 설정

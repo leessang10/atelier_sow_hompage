@@ -1,13 +1,13 @@
 'use client';
 
+import {projects} from "@/app/api/data/projects";
 import CustomNextButton from '@/components/slider/CustomNextButton';
 import CustomPrevButton from '@/components/slider/CustomPrevButton';
 import Image from 'next/image';
-import React, { useRef } from 'react';
+import React, {useRef} from 'react';
 import Slider from 'react-slick';
 import 'slick-carousel/slick/slick.css';
 import 'slick-carousel/slick/slick-theme.css';
-import { projects } from './projectsv2/projects';
 
 export default function Home() {
   const sliderRef = useRef<Slider | null>(null);
@@ -32,7 +32,7 @@ export default function Home() {
               <Image src={project.mainImage} alt={project.title} fill style={{ objectFit: 'cover' }} sizes="100vw" />
               <div className="absolute inset-0 flex flex-col justify-center items-center text-center bg-black bg-opacity-40">
                 <h2 className="text-3xl font-bold text-white mb-2">{project.title}</h2>
-                <p className="text-lg text-gray-200">{project.description}</p>
+                <p className="text-lg text-gray-200">{project.subtitle}</p>
               </div>
             </div>
           ))}
