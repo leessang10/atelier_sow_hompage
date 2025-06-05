@@ -1,8 +1,8 @@
-import { getPressItems } from '@/lib/notion/notion';
+import {getPressItems} from "@/app/api/data/press";
+import {PressItem} from "@/app/press/types";
 import PageHeader from '../../components/PageHeader';
 import PressClient from './PressClient';
-import { PressItem } from './types';
-
+ 
 // 페이지 동적 설정
 export const revalidate = 10; // 10초마다 재검증
 

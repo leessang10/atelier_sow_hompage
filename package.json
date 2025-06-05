@@ -8,13 +8,10 @@
     "start": "next start",
     "lint": "next lint",
     "test": "jest",
-    "test:dev": "tsx lib/notion/notion.ts",
     "vercel:env:pull": "vercel env pull .env.development.local"
   },
   "dependencies": {
-    "@aws-amplify/adapter-nextjs": "^1.6.1",
     "@vercel/blob": "^0.27.0",
-    "aws-amplify": "^6.14.3",
     "dayjs": "^1.11.13",
     "framer-motion": "^11.15.0",
     "next": "^15.2.4",
@@ -30,7 +27,6 @@
     "@eslint/eslintrc": "^3",
     "@types/jest": "^29.5.14",
     "@types/node": "^20.17.19",
-    "@types/nodemailer": "^6.4.17",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "@types/react-slick": "^0.23.13",
@@ -43,5 +39,6 @@
     "ts-jest": "^29.2.5",
     "ts-node": "^10.9.2",
     "typescript": "^5.7.3"
-  }
+  },
+  "packageManager": "yarn@1.22.22+sha512.a6b2f7906b721bba3d67d4aff083df04dad64c399707841b7acf00f6b133b7ac24255f2652fa22ae3534329dc6180534e98d17432037ff6fd140556e2bb3137e"
 }

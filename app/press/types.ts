@@ -12,9 +12,10 @@ export interface PressItem {
   content: NotionBlock[];
   date: string;
   source: string;
-  category: 'news' | 'article' | 'interview';
+  category?: 'news' | 'article' | 'interview';
   thumbnail?: string;
   link?: string;
+  published: boolean;
 }
 
 export interface PressFilter {

@@ -1,7 +1,7 @@
+import {getProjects} from "@/app/api/data/projects";
+import {Project} from "@/app/projects/types";
 import PageHeader from '../../components/PageHeader';
-import { getProjects } from '@/lib/notion/notion';
 import ProjectGrid from './ProjectGrid';
-import { Project } from './types';
 
 // 페이지 동적 설정
 export const revalidate = 10; // 10초마다 재검증

@@ -1,4 +1,4 @@
-import { getPressItem } from '@/lib/notion/notion';
+import { getPressItem } from '@/lib/temp-data';
 import PageHeader from '../../../components/PageHeader';
 import { notFound } from 'next/navigation';
 import PressDetailClient from './PressDetailClient';

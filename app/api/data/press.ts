@@ -1,9 +1,13 @@
-export const pressItems = [
+import {PressItem} from "@/app/press/types";
+
+export const pressItems: PressItem[] = [
   {
     id: '1',
     title: '샘플 보도자료',
     date: new Date().toISOString(),
+    content: [{type: '', text: ''}],
     source: '샘플 출처',
+    category: 'news',
     link: '#',
     published: true,
   },
