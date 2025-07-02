@@ -1,72 +1,33 @@
-'use client';
+import { getPublishedProjects } from '@/lib/supabase';
+import { SupabaseProject } from '@/types/project.types';
+import ProjectSlider from '@/components/ProjectSlider';
 
+// 페이지 재검증 설정 (60초마다)
+export const revalidate = 60;
 
-import CustomNextButton from '@/components/slider/CustomNextButton';
-import CustomPrevButton from '@/components/slider/CustomPrevButton';
-import {Project} from "@/types/project.types";
-import Image from 'next/image';
-import React, {useEffect, useRef, useState} from 'react';
-import Slider from 'react-slick';
-import 'slick-carousel/slick/slick.css';
-import 'slick-carousel/slick/slick-theme.css';
+export default async function Home() {
+  let projects: SupabaseProject[] = [];
+  let error = null;
 
-export default function Home() {
-  const sliderRef = useRef<Slider | null>(null);
-  const [projects, setProjects] = useState<Project[]>([])
-  const [error, setError] = useState<string | null>(null);
-
-
-  // ✅ 클라이언트에서 API 호출
-  useEffect(() => {
-    const fetchProjects = async () => {
-      try {
-        const res = await fetch('/api/projects')
-        const data = await res.json()
-
-        if (res.ok) {
-          setProjects(data)
-        } else {
-          setError(data.error || '불러오기 실패')
-        }
-      } catch (err) {
-        setError('네트워크 오류')
-      }
-    }
-
-    fetchProjects()
-  }, [])
-  const settings = {
-    dots: false,
-    infinite: true,
-    speed: 1000,
-    slidesToShow: 1,
-    slidesToScroll: 1,
-    autoplay: true,
-    autoplaySpeed: 5000,
-    arrows: false,
-  };
+  try {
+    projects = await getPublishedProjects();
+  } catch (e) {
+    console.error('프로젝트를 불러오는 중 오류가 발생했습니다:', e);
+    error = e instanceof Error ? e.message : '알 수 없는 오류가 발생했습니다.';
+  }
 
   return (
     <main className="min-h-screen bg-white dark:bg-dark-bg transition-colors relative overflow-hidden">
-      <div className="relative h-screen w-screen">
-        <Slider ref={sliderRef} {...settings}>
-          {projects.map((project, index) => (
-            <div key={index} className="relative h-screen w-screen">
-              <Image src={project.main_image} alt={project.title} fill style={{ objectFit: 'cover' }} sizes="100vw" />
-              <div className="absolute inset-0 flex flex-col justify-center items-center text-center bg-black bg-opacity-40">
-                <h2 className="text-3xl font-bold text-white mb-2">{project.title}</h2>
-                <p className="text-lg text-gray-200">{project.subtitle}</p>
-              </div>
-            </div>
-          ))}
-        </Slider>
-        <div className="absolute inset-y-0 left-0 flex items-center z-20">
-          <CustomPrevButton sliderRef={sliderRef} />
+      {error ? (
+        <div className="h-screen w-screen flex items-center justify-center bg-gray-100 dark:bg-gray-800">
+          <div className="text-center">
+            <p className="text-red-500 dark:text-red-400 mb-4">{error}</p>
+            <p className="text-gray-500 dark:text-gray-400">잠시 후 다시 시도해주세요.</p>
+          </div>
         </div>
-        <div className="absolute inset-y-0 right-0 flex items-center z-20">
-          <CustomNextButton sliderRef={sliderRef} />
-        </div>
-      </div>
+      ) : (
+        <ProjectSlider projects={projects} />
+      )}
 
       <section className="py-20 px-4 bg-white dark:bg-dark-bg relative z-0">
         <div className="max-w-7xl mx-auto">

@@ -1,14 +1,14 @@
 'use client';
 
 import Link from 'next/link';
-import {useState} from 'react';
+import { useState } from 'react';
 import DesktopMenuItem from './navigation/DesktopMenuItem';
 import MobileMenu from './navigation/MobileMenu';
 import ThemeToggle from './ThemeToggle';
 
 const menuItems = [
   { href: '/about', text: 'About' },
-  { href: '/projects/v2', text: 'Projects' },
+  { href: '/projects/v3', text: 'Projects' },
   { href: '/press', text: 'Press' },
   { href: '/process', text: 'Process' },
   { href: '/contact', text: 'Contact' },
