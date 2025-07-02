@@ -1,27 +1,73 @@
-@import "pretendard/dist/web/static/pretendard.css";
+@import 'pretendard/dist/web/static/pretendard.css';
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 :root {
-    --foreground-rgb: 0, 0, 0;
-    --background-start-rgb: 214, 219, 220;
-    --background-end-rgb: 255, 255, 255;
-    --font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, "SF Pro Display",
-    "SF Pro Text", "Segoe UI", "Apple SD Gothic Neo", "Malgun Gothic", "맑은 고딕",
-    "Noto Sans KR", "Roboto", system-ui, sans-serif;
+  --foreground-rgb: 0, 0, 0;
+  --background-start-rgb: 214, 219, 220;
+  --background-end-rgb: 255, 255, 255;
+  --font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', 'Segoe UI', 'Apple SD Gothic Neo', 'Malgun Gothic', '맑은 고딕', 'Noto Sans KR', 'Roboto', system-ui,
+    sans-serif;
 }
 
 @media (prefers-color-scheme: dark) {
-    :root {
-        --background: #0a0a0a;
-        --foreground: #ededed;
-    }
+  :root {
+    --background: #0a0a0a;
+    --foreground: #ededed;
+  }
 }
 
 body {
-    color: var(--foreground);
-    background: var(--background);
-    font-family: var(--font-family); /* Pretendard를 포함한 폰트 적용 */
+  color: var(--foreground);
+  background: var(--background);
+  font-family: var(--font-family); /* Pretendard를 포함한 폰트 적용 */
+}
+
+/* Tiptap 콘텐츠를 위한 추가 스타일 */
+.tiptap-content {
+  @apply text-gray-800 dark:text-gray-200;
+}
+
+.tiptap-content h1,
+.tiptap-content h2,
+.tiptap-content h3,
+.tiptap-content h4,
+.tiptap-content h5,
+.tiptap-content h6 {
+  @apply font-bold text-gray-900 dark:text-white;
+}
+
+.tiptap-content p {
+  @apply mb-4 leading-relaxed;
+}
+
+.tiptap-content a {
+  @apply text-blue-600 dark:text-blue-400 hover:underline;
+}
+
+.tiptap-content ul,
+.tiptap-content ol {
+  @apply mb-4 space-y-2;
+}
+
+.tiptap-content li {
+  @apply text-gray-700 dark:text-gray-300;
+}
+
+.tiptap-content blockquote {
+  @apply border-l-4 border-gray-300 dark:border-gray-600 pl-4 mb-4 italic text-gray-700 dark:text-gray-300;
+}
+
+.tiptap-content pre {
+  @apply bg-gray-100 dark:bg-gray-800 p-4 rounded-lg mb-4 overflow-x-auto;
+}
+
+.tiptap-content code {
+  @apply text-sm text-gray-800 dark:text-gray-200;
+}
+
+.tiptap-content img {
+  @apply max-w-full h-auto rounded-lg mb-4;
 }
