@@ -1,32 +1,48 @@
-import {getPressItem} from "@/api/data/press";
-import {notFound} from 'next/navigation';
-import PageHeader from '../../../components/PageHeader';
+import { Metadata } from 'next';
+import { getPressItem } from '@/lib/supabase';
+import { notFound } from 'next/navigation';
 import PressDetailClient from './PressDetailClient';
-// 페이지 동적 설정
-export const revalidate = 10; // 10초마다 재검증
 
-interface PressDetailPageProps {
-  params: Promise<{
+interface PageProps {
+  params: {
     id: string;
-  }>;
+  };
 }
 
-export default async function PressDetailPage({ params }: PressDetailPageProps) {
-  const resolvedParams = await params;
-  const pressItem = await getPressItem(resolvedParams.id);
+// 메타데이터 생성
+export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+  const pressItem = await getPressItem(parseInt(params.id));
+
+  if (!pressItem) {
+    return {
+      title: '보도자료를 찾을 수 없습니다 - SOW',
+    };
+  }
+
+  return {
+    title: `${pressItem.title} - SOW`,
+    description: pressItem.subtitle || pressItem.excerpt || '보도자료',
+    openGraph: {
+      title: pressItem.title,
+      description: pressItem.subtitle || pressItem.excerpt || '보도자료',
+      images: pressItem.main_image ? [pressItem.main_image] : [],
+    },
+  };
+}
+
+export default async function PressDetailPage({ params }: PageProps) {
+  const pressId = parseInt(params.id);
+
+  // ID가 유효한 숫자인지 확인
+  if (isNaN(pressId)) {
+    notFound();
+  }
+
+  const pressItem = await getPressItem(pressId);
 
   if (!pressItem) {
     notFound();
   }
 
-  return (
-    <main className="min-h-screen bg-white dark:bg-dark-bg transition-colors">
-      <PageHeader title="보도자료 상세" description={pressItem.title} />
-      <section className="py-12 px-4">
-        <div className="max-w-4xl mx-auto">
-          <PressDetailClient pressItem={pressItem} />
-        </div>
-      </section>
-    </main>
-  );
+  return <PressDetailClient pressItem={pressItem} />;
 }

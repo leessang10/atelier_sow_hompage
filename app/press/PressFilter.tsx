@@ -15,9 +15,10 @@ export default function PressFilter({ filter, onFilterChange, availableYears }: 
         className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-dark-card text-gray-700 dark:text-gray-300"
       >
         <option value="">모든 카테고리</option>
-        <option value="news">뉴스</option>
-        <option value="article">기사</option>
-        <option value="interview">인터뷰</option>
+        <option value="AWARD">수상</option>
+        <option value="NEWS">뉴스</option>
+        <option value="INTERVIEW">인터뷰</option>
+        <option value="EVENT">이벤트</option>
       </select>
 
       <select
