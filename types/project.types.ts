@@ -25,6 +25,26 @@ export interface SupabaseProject {
   body: any; // Tiptap JSON 형식
 }
 
+// Supabase contact 테이블용 타입
+export interface SupabaseContact {
+  id: number;
+  created_at: string;
+  name: string;
+  email: string;
+  phone?: string;
+  message: string;
+  status: 'PENDING' | 'PROCESSING' | 'COMPLETED' | 'ARCHIVED';
+  is_read: boolean;
+}
+
+// Contact 폼 데이터 타입
+export interface ContactFormData {
+  name: string;
+  email: string;
+  phone?: string;
+  message: string;
+}
+
 // Tiptap JSON 구조를 위한 타입
 export interface TiptapNode {
   type: string;

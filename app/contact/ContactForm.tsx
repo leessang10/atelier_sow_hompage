@@ -1,22 +1,22 @@
-import { motion } from 'framer-motion';
-import React, { useState } from 'react';
+'use client';
 
-interface FormData {
-  name: string;
-  email: string;
-  phone: string;
-  message: string;
+import { motion } from 'framer-motion';
+import React, { useState, useTransition } from 'react';
+import { ContactFormData } from '@/types/project.types';
+
+interface ContactFormProps {
+  submitAction: (formData: FormData) => Promise<void>;
 }
 
-export default function ContactForm() {
-  const [formData, setFormData] = useState<FormData>({
+export default function ContactForm({ submitAction }: ContactFormProps) {
+  const [formData, setFormData] = useState<ContactFormData>({
     name: '',
     email: '',
     phone: '',
     message: '',
   });
-  const [loading, setLoading] = useState(false);
-  const [status, setStatus] = useState<'idle' | 'success' | 'error'>('idle');
+  const [isPending, startTransition] = useTransition();
+  const [error, setError] = useState<string | null>(null);
 
   // 전화번호 포맷팅 함수
   const formatPhoneNumber = (phone: string) => {
@@ -34,7 +34,7 @@ export default function ContactForm() {
       return `${cleaned.slice(0, 3)} ${cleaned.slice(3, 6)} ${cleaned.slice(6, 10)}`;
     }
 
-    // 다른 길이의 전화번호는 그대로 반환 (또는 필요시 다른 처리를 할 수 있음)
+    // 다른 길이의 전화번호는 그대로 반환
     return phone;
   };
 
@@ -44,70 +44,72 @@ export default function ContactForm() {
     return emailRegex.test(email);
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    setLoading(true);
-    setStatus('idle');
+    setError(null);
 
-    // 이메일 유효성 검사
+    // 클라이언트 사이드 유효성 검사
     if (!validateEmail(formData.email)) {
-      alert('유효한 이메일 주소를 입력해주세요.');
-      setLoading(false);
+      setError('유효한 이메일 주소를 입력해주세요.');
       return;
     }
 
-    try {
-      const response = await fetch('/api/contact', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(formData),
-      });
+    const form = e.currentTarget;
+    const formDataObj = new FormData(form);
 
-      if (response.ok) {
-        setStatus('success');
-        setFormData({ name: '', email: '', phone: '', message: '' });
-      } else {
-        const data = await response.json();
-        console.error('Error response:', data);
-        setStatus('error');
+    startTransition(async () => {
+      try {
+        await submitAction(formDataObj);
+        // 성공 시 폼 초기화는 페이지 리다이렉트로 인해 자동으로 됨
+      } catch (error) {
+        // NEXT_REDIRECT는 정상적인 리다이렉트 동작이므로 에러로 처리하지 않음
+        if (error instanceof Error && error.message.includes('NEXT_REDIRECT')) {
+          return; // 리다이렉트는 성공으로 간주하고 에러 표시하지 않음
+        }
+
+        console.error('Form submission error:', error);
+        setError(error instanceof Error ? error.message : '문의 접수 중 오류가 발생했습니다.');
       }
-    } catch (error) {
-      console.error('Error submitting contact form:', error);
-      setStatus('error');
-    } finally {
-      setLoading(false);
-    }
+    });
   };
 
   return (
     <motion.form onSubmit={handleSubmit} className="space-y-6" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }}>
+      {error && (
+        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-700 rounded-md">
+          <p className="text-red-700 dark:text-red-300 text-center">{error}</p>
+        </motion.div>
+      )}
+
       <div>
         <label htmlFor="name" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-          이름
+          이름 *
         </label>
         <input
           type="text"
           id="name"
+          name="name"
           value={formData.name}
           onChange={(e) => setFormData({ ...formData, name: e.target.value })}
           className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-dark-card dark:text-white"
           required
+          disabled={isPending}
         />
       </div>
 
       <div>
         <label htmlFor="email" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-          이메일
+          이메일 *
         </label>
         <input
           type="email"
           id="email"
+          name="email"
           value={formData.email}
           onChange={(e) => setFormData({ ...formData, email: e.target.value })}
           className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-dark-card dark:text-white"
           required
+          disabled={isPending}
         />
       </div>
 
@@ -118,33 +120,38 @@ export default function ContactForm() {
         <input
           type="tel"
           id="phone"
-          value={formData.phone}
-          onChange={(e) => setFormData({ ...formData, phone: formatPhoneNumber(e.target.value) })}
+          name="phone"
+          value={formData.phone || ''}
+          onChange={(e) => setFormData({ ...formData, phone: formatPhoneNumber(e.target.value) || undefined })}
           className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-dark-card dark:text-white"
-          maxLength={13} // 최대 길이를 13자리로 제한 (예: 010-7124-4032)
+          maxLength={13}
+          disabled={isPending}
         />
       </div>
 
       <div>
         <label htmlFor="message" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-          문의내용
+          문의내용 *
         </label>
         <textarea
           id="message"
+          name="message"
           rows={6}
           value={formData.message}
           onChange={(e) => setFormData({ ...formData, message: e.target.value })}
           className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-dark-card dark:text-white"
           required
+          disabled={isPending}
         />
       </div>
 
-      <button type="submit" className="w-full bg-black dark:bg-white text-white dark:text-black py-3 px-6 rounded-md hover:bg-gray-800 dark:hover:bg-gray-100 transition-colors" disabled={loading}>
-        {loading ? '전송 중...' : '문의하기'}
+      <button
+        type="submit"
+        className="w-full bg-black dark:bg-white text-white dark:text-black py-3 px-6 rounded-md hover:bg-gray-800 dark:hover:bg-gray-100 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+        disabled={isPending}
+      >
+        {isPending ? '전송 중...' : '문의하기'}
       </button>
-
-      {status === 'success' && <p className="text-green-500">문의가 성공적으로 전송되었습니다!</p>}
-      {status === 'error' && <p className="text-red-500">문의 전송에 실패했습니다. 다시 시도해주세요.</p>}
     </motion.form>
   );
 }
