@@ -2,6 +2,7 @@
 
 import React from 'react';
 import { TiptapDocument, TiptapNode } from '@/types/project.types';
+import Image from 'next/image';
 
 interface TiptapRendererProps {
   content: TiptapDocument | TiptapNode;
@@ -123,7 +124,7 @@ export default function TiptapRenderer({ content }: TiptapRendererProps) {
       case 'image':
         return (
           <div key={key} className="mb-4">
-            <img src={node.attrs?.src} alt={node.attrs?.alt || ''} className="max-w-full h-auto rounded-lg" />
+            <Image src={node.attrs?.src} alt={node.attrs?.alt || ''} className="max-w-full h-auto rounded-lg" />
           </div>
         );
 

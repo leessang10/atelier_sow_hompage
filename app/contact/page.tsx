@@ -43,13 +43,15 @@ async function submitContact(formData: FormData) {
 }
 
 interface ContactPageProps {
-  searchParams: {
+  searchParams: Promise<{
     success?: string;
     error?: string;
-  };
+  }>;
 }
 
-export default function Contact({ searchParams }: ContactPageProps) {
+export default async function Contact({ searchParams }: ContactPageProps) {
+  const params = await searchParams;
+
   return (
     <main className="min-h-screen bg-white dark:bg-dark-bg transition-colors">
       <PageHeader title="문의하기" description="프로젝트에 대해 상담해보세요" />
@@ -60,15 +62,15 @@ export default function Contact({ searchParams }: ContactPageProps) {
             <h2 className="text-xl font-semibold mb-6 text-gray-800 dark:text-gray-200">문의하기</h2>
 
             {/* 성공/에러 메시지 표시 */}
-            {searchParams.success && (
+            {params.success && (
               <div className="mb-6 p-4 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-700 rounded-md">
                 <p className="text-green-700 dark:text-green-300 text-center">문의가 성공적으로 전송되었습니다! 빠른 시일 내에 답변드리겠습니다.</p>
               </div>
             )}
 
-            {searchParams.error && (
+            {params.error && (
               <div className="mb-6 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-700 rounded-md">
-                <p className="text-red-700 dark:text-red-300 text-center">{decodeURIComponent(searchParams.error)}</p>
+                <p className="text-red-700 dark:text-red-300 text-center">{decodeURIComponent(params.error)}</p>
               </div>
             )}
 

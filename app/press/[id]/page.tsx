@@ -4,14 +4,15 @@ import { notFound } from 'next/navigation';
 import PressDetailClient from './PressDetailClient';
 
 interface PageProps {
-  params: {
+  params: Promise<{
     id: string;
-  };
+  }>;
 }
 
 // 메타데이터 생성
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
-  const pressItem = await getPressItem(parseInt(params.id));
+  const { id } = await params;
+  const pressItem = await getPressItem(parseInt(id));
 
   if (!pressItem) {
     return {
@@ -31,7 +32,8 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 }
 
 export default async function PressDetailPage({ params }: PageProps) {
-  const pressId = parseInt(params.id);
+  const { id } = await params;
+  const pressId = parseInt(id);
 
   // ID가 유효한 숫자인지 확인
   if (isNaN(pressId)) {
