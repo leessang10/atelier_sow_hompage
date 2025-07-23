@@ -22,7 +22,7 @@ export default function Footer() {
                         <h3 className="text-xl font-bold mb-4 dark:text-white">Follow Us</h3>
                         <div className="flex gap-6">
                             <a
-                                href="https://www.instagram.com/atelier__sow"
+                                href="https://www.instagram.com/ateliersow_official"
                                 target="_blank"
                                 rel="noopener noreferrer"
                                 className="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors"
