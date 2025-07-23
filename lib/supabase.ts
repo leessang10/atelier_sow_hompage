@@ -1,6 +1,6 @@
-import { SupabasePressItem } from '@/app/press/types';
-import { ContactFormData, SupabaseContact, SupabaseProject } from '@/types/project.types';
-import { createClient } from '@supabase/supabase-js';
+import {SupabasePressItem} from '@/app/press/types';
+import {ContactFormData, SupabaseContact, SupabaseProject} from '@/types/project.types';
+import {createClient} from '@supabase/supabase-js';
 
 export const supabase = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!);
 
@@ -38,10 +38,10 @@ export async function getProject(id: string): Promise<SupabaseProject | null> {
 
 // 발행된 보도자료 목록 가져오기
 export const getPublishedPressItems = async (): Promise<SupabasePressItem[]> => {
-  const { data, error } = await supabase.from('press').select('*').eq('is_published', true).order('published_date', { ascending: false });
+  const { data, error } = await supabase.from('Press').select('*').eq('is_published', true).order('published_date', { ascending: false });
 
   if (error) {
-    console.error('Error fetching press items:', error);
+    console.error('Error fetching Press items:', error);
     throw error;
   }
 
@@ -50,10 +50,10 @@ export const getPublishedPressItems = async (): Promise<SupabasePressItem[]> => 
 
 // 특정 보도자료 가져오기
 export const getPressItem = async (id: number): Promise<SupabasePressItem | null> => {
-  const { data, error } = await supabase.from('press').select('*').eq('id', id).eq('is_published', true).single();
+  const { data, error } = await supabase.from('Press').select('*').eq('id', id).eq('is_published', true).single();
 
   if (error) {
-    console.error('Error fetching press item:', error);
+    console.error('Error fetching Press item:', error);
     return null;
   }
 
@@ -62,10 +62,10 @@ export const getPressItem = async (id: number): Promise<SupabasePressItem | null
 
 // 카테고리별 보도자료 가져오기
 export const getPressItemsByCategory = async (category: string): Promise<SupabasePressItem[]> => {
-  const { data, error } = await supabase.from('press').select('*').eq('category', category).eq('is_published', true).order('published_date', { ascending: false });
+  const { data, error } = await supabase.from('Press').select('*').eq('category', category).eq('is_published', true).order('published_date', { ascending: false });
 
   if (error) {
-    console.error('Error fetching press items by category:', error);
+    console.error('Error fetching Press items by category:', error);
     throw error;
   }
 
@@ -75,7 +75,7 @@ export const getPressItemsByCategory = async (category: string): Promise<Supabas
 // 연도별 보도자료 가져오기
 export const getPressItemsByYear = async (year: string): Promise<SupabasePressItem[]> => {
   const { data, error } = await supabase
-    .from('press')
+    .from('Press')
     .select('*')
     .gte('published_date', `${year}-01-01`)
     .lte('published_date', `${year}-12-31`)
@@ -83,7 +83,7 @@ export const getPressItemsByYear = async (year: string): Promise<SupabasePressIt
     .order('published_date', { ascending: false });
 
   if (error) {
-    console.error('Error fetching press items by year:', error);
+    console.error('Error fetching Press items by year:', error);
     throw error;
   }
 
