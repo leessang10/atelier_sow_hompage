@@ -1,0 +1,276 @@
+{
+  "global_design_system": {
+    "color_palette": {
+      "primary_colors": {
+        "description": "건축 회사들의 주요 색상",
+        "values": [
+          "#000000", // 블랙 - 대부분의 건축 사무소에서 텍스트와 로고에 사용
+          "#FFFFFF", // 화이트 - 배경색과 대비용으로 주로 사용
+          "#333333", // 다크 그레이 - 부제목과 내비게이션에 사용
+          "#666666", // 미디엄 그레이 - 설명 텍스트용
+          "#999999"  // 라이트 그레이 - 보조 정보용
+        ]
+      },
+      "accent_colors": {
+        "description": "포인트 색상 (브랜딩에 따라 선택적 사용)",
+        "values": [
+          "#F5F5F5", // 아이보리/오프화이트 - 섹션 구분용
+          "#E8E8E8", // 연한 그레이 - 카드 배경용
+          "#2C2C2C"  // 진한 그레이 - 헤더/푸터용
+        ]
+      }
+    },
+    "typography": {
+      "font_families": {
+        "korean": {
+          "primary": "Noto Sans KR, -apple-system, BlinkMacSystemFont, 'Malgun Gothic', '맑은 고딕', sans-serif",
+          "secondary": "Spoqa Han Sans Neo, Apple SD Gothic Neo, sans-serif"
+        },
+        "english": {
+          "primary": "Helvetica Neue, Arial, sans-serif",
+          "secondary": "Inter, -apple-system, BlinkMacSystemFont, sans-serif",
+          "accent": "GT America, sans-serif"
+        }
+      },
+      "font_sizes": {
+        "heading_1": "clamp(2rem, 4vw, 3.5rem)",
+        "heading_2": "clamp(1.5rem, 3vw, 2.5rem)",
+        "heading_3": "clamp(1.25rem, 2.5vw, 2rem)",
+        "body_large": "1.125rem",
+        "body_medium": "1rem",
+        "body_small": "0.875rem",
+        "caption": "0.75rem"
+      },
+      "font_weights": {
+        "light": 300,
+        "regular": 400,
+        "medium": 500,
+        "bold": 700
+      },
+      "line_heights": {
+        "tight": 1.2,
+        "normal": 1.5,
+        "loose": 1.8
+      }
+    },
+    "layout": {
+      "container": {
+        "max_width": "1200px",
+        "padding_x": "clamp(1rem, 5vw, 2rem)",
+        "margin_x": "auto"
+      },
+      "grid": {
+        "columns": 12,
+        "gap": "clamp(1rem, 2vw, 2rem)"
+      },
+      "spacing": {
+        "xs": "0.5rem",
+        "sm": "1rem",
+        "md": "1.5rem",
+        "lg": "2rem",
+        "xl": "3rem",
+        "xxl": "4rem",
+        "section": "clamp(3rem, 8vw, 6rem)"
+      }
+    },
+    "components": {
+      "navigation": {
+        "height": "80px",
+        "background": "rgba(255, 255, 255, 0.95)",
+        "backdrop_filter": "blur(10px)",
+        "border_bottom": "1px solid rgba(0, 0, 0, 0.1)",
+        "position": "fixed",
+        "z_index": 1000,
+        "animation": "slideDown 0.6s ease-out"
+      },
+      "hero_section": {
+        "min_height": "100vh",
+        "display": "flex",
+        "align_items": "center",
+        "justify_content": "center",
+        "background": "linear-gradient(135deg, #f5f5f5 0%, #ffffff 100%)",
+        "text_align": "center"
+      },
+      "project_grid": {
+        "display": "grid",
+        "grid_template_columns": "repeat(auto-fit, minmax(300px, 1fr))",
+        "gap": "2rem",
+        "padding": "2rem 0"
+      },
+      "cards": {
+        "background": "#ffffff",
+        "border_radius": "8px",
+        "box_shadow": "0 4px 20px rgba(0, 0, 0, 0.1)",
+        "transition": "all 0.3s ease",
+        "hover_transform": "translateY(-5px)",
+        "hover_shadow": "0 8px 30px rgba(0, 0, 0, 0.15)"
+      },
+      "buttons": {
+        "primary": {
+          "background": "#000000",
+          "color": "#ffffff",
+          "border": "none",
+          "padding": "0.75rem 2rem",
+          "border_radius": "4px",
+          "font_weight": 500,
+          "transition": "all 0.3s ease",
+          "hover_background": "#333333"
+        },
+        "secondary": {
+          "background": "transparent",
+          "color": "#000000",
+          "border": "1px solid #000000",
+          "padding": "0.75rem 2rem",
+          "border_radius": "4px",
+          "font_weight": 500,
+          "transition": "all 0.3s ease",
+          "hover_background": "#000000",
+          "hover_color": "#ffffff"
+        }
+      }
+    },
+    "animations": {
+      "fade_in": {
+        "keyframes": "@keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }",
+        "duration": "0.8s",
+        "timing_function": "ease-out"
+      },
+      "slide_down": {
+        "keyframes": "@keyframes slideDown { from { transform: translateY(-100%); } to { transform: translateY(0); } }",
+        "duration": "0.6s",
+        "timing_function": "ease-out"
+      },
+      "scale_hover": {
+        "transform": "scale(1.05)",
+        "transition": "transform 0.3s ease"
+      }
+    },
+    "responsive": {
+      "breakpoints": {
+        "sm": "640px",
+        "md": "768px",
+        "lg": "1024px",
+        "xl": "1280px",
+        "xxl": "1536px"
+      },
+      "mobile_first": true,
+      "container_queries": true
+    }
+  },
+  "common_patterns": {
+    "header": {
+      "structure": "Logo + Navigation + Contact",
+      "logo_position": "left",
+      "navigation_style": "horizontal_menu",
+      "mobile_menu": "hamburger_overlay",
+      "typical_nav_items": [
+        "About/Practice/Studio",
+        "Projects/Works/Portfolio", 
+        "Awards/Recognition",
+        "Exhibitions/Press",
+        "Writings/News/Blog",
+        "Contact"
+      ]
+    },
+    "hero_section": {
+      "layout": "fullscreen_with_centered_text",
+      "image_treatment": "large_architectural_photography",
+      "text_overlay": "minimal_typography",
+      "cta": "subtle_scroll_indicator"
+    },
+    "project_showcase": {
+      "layout": "grid_or_masonry",
+      "image_ratio": "4:3 or 16:9",
+      "hover_effects": "subtle_overlay_with_text",
+      "information_display": "title_year_location"
+    },
+    "footer": {
+      "content": "copyright + address + contact_info",
+      "style": "minimal_single_line",
+      "background": "light_grey_or_white"
+    }
+  },
+  "brand_specific_variations": {
+    "archiworkshop": {
+      "philosophy": "일상의 건축 (Everyday Architecture)",
+      "visual_style": "clean_minimal_korean_english_bilingual",
+      "color_preference": "monochromatic_with_warm_accents"
+    },
+    "on_architects": {
+      "philosophy": "지역 건축의 가치와 가능성 탐구",
+      "visual_style": "warm_approachable_community_focused",
+      "color_preference": "earth_tones_with_natural_materials"
+    },
+    "the_system_lab": {
+      "philosophy": "NEW TYPOLOGY through rational innovation",
+      "visual_style": "bold_experimental_technology_forward",
+      "color_preference": "high_contrast_with_accent_colors",
+      "image_style": "dramatic_architectural_photography"
+    },
+    "obba": {
+      "philosophy": "Office for Beyond Boundaries Architecture",
+      "visual_style": "artistic_boundary_crossing_creative",
+      "color_preference": "varied_experimental_context_dependent"
+    }
+  },
+  "technical_specifications": {
+    "performance": {
+      "page_load_time": "< 3 seconds",
+      "image_optimization": "WebP format with fallbacks",
+      "lazy_loading": "intersection_observer_api",
+      "critical_css": "inline_above_fold_styles"
+    },
+    "accessibility": {
+      "wcag_level": "AA",
+      "semantic_html": true,
+      "keyboard_navigation": true,
+      "screen_reader_support": true,
+      "color_contrast_ratio": "4.5:1 minimum"
+    },
+    "seo": {
+      "structured_data": "organization_and_creative_work",
+      "meta_tags": "comprehensive_with_open_graph",
+      "url_structure": "semantic_and_clean",
+      "sitemap": "xml_and_html_versions"
+    }
+  },
+  "content_strategy": {
+    "imagery": {
+      "primary": "high_quality_architectural_photography",
+      "style": "natural_lighting_minimal_post_processing",
+      "aspect_ratios": ["16:9", "4:3", "1:1", "3:4"],
+      "subjects": ["completed_projects", "construction_process", "detail_shots", "contextual_views"]
+    },
+    "copywriting": {
+      "tone": "professional_yet_approachable",
+      "language": "bilingual_korean_english",
+      "content_types": ["project_descriptions", "philosophy_statements", "news_updates", "award_announcements"]
+    },
+    "project_presentation": {
+      "information_hierarchy": ["project_name", "year", "location", "program", "area", "client"],
+      "image_sequence": ["exterior_hero", "interior_spaces", "details", "context"],
+      "text_length": "concise_descriptive_paragraphs"
+    }
+  },
+  "trends_observed": {
+    "visual_trends": [
+      "minimalist_clean_layouts",
+      "large_high_quality_imagery",
+      "generous_white_space",
+      "subtle_animations_and_transitions",
+      "mobile_first_responsive_design"
+    ],
+    "interaction_patterns": [
+      "smooth_scrolling",
+      "hover_state_micro_interactions", 
+      "progressive_image_loading",
+      "contextual_navigation_highlights"
+    ],
+    "content_trends": [
+      "bilingual_presentation",
+      "emphasis_on_design_philosophy",
+      "behind_the_scenes_process_documentation",
+      "sustainability_and_social_impact_messaging"
+    ]
+  }
+}
