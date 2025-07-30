@@ -92,7 +92,7 @@ function ProjectCard({
   const cardContent = (
     <div
       className={cn(
-        'relative group overflow-hidden rounded-lg bg-gray-100 dark:bg-gray-800 transition-all duration-300',
+        'relative group overflow-hidden bg-gray-100 dark:bg-gray-800 transition-all duration-300',
         {
           'hover:-translate-y-2 hover:shadow-xl': hoverEffect === 'lift',
           'hover:scale-105': hoverEffect === 'scale',
@@ -139,17 +139,17 @@ function ProjectCard({
             )}
             <div className="flex flex-wrap gap-2 text-xs">
               {project.year && (
-                <span className="bg-white/20 px-2 py-1 rounded">
+                <span className="bg-white/20 px-2 py-1">
                   {project.year}
                 </span>
               )}
               {project.location && (
-                <span className="bg-white/20 px-2 py-1 rounded">
+                <span className="bg-white/20 px-2 py-1">
                   {project.location}
                 </span>
               )}
               {project.category && (
-                <span className="bg-white/20 px-2 py-1 rounded">
+                <span className="bg-white/20 px-2 py-1">
                   {project.category}
                 </span>
               )}

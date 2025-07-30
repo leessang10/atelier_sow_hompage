@@ -178,13 +178,13 @@ export default function ComponentShowcase() {
             <div>
               <Text variant="small" color="muted" className="mb-4">Container Sizes</Text>
               <div className="space-y-4">
-                <Container size="sm" className="bg-blue-100 dark:bg-blue-900 p-4 rounded">
+                <Container size="sm" className="bg-blue-100 dark:bg-blue-900 p-4">
                   <Text>Small Container (max-w-3xl)</Text>
                 </Container>
-                <Container size="md" className="bg-green-100 dark:bg-green-900 p-4 rounded">
+                <Container size="md" className="bg-green-100 dark:bg-green-900 p-4">
                   <Text>Medium Container (max-w-4xl)</Text>
                 </Container>
-                <Container size="lg" className="bg-yellow-100 dark:bg-yellow-900 p-4 rounded">
+                <Container size="lg" className="bg-yellow-100 dark:bg-yellow-900 p-4">
                   <Text>Large Container (max-w-6xl)</Text>
                 </Container>
               </div>
@@ -196,10 +196,10 @@ export default function ComponentShowcase() {
                 <div>
                   <Text variant="caption" className="mb-2">2 Column Grid</Text>
                   <Grid cols={2} gap="md">
-                    <GridItem className="bg-gray-200 dark:bg-gray-700 p-4 rounded">
+                    <GridItem className="bg-gray-200 dark:bg-gray-700 p-4">
                       <Text>Column 1</Text>
                     </GridItem>
-                    <GridItem className="bg-gray-200 dark:bg-gray-700 p-4 rounded">
+                    <GridItem className="bg-gray-200 dark:bg-gray-700 p-4">
                       <Text>Column 2</Text>
                     </GridItem>
                   </Grid>
@@ -209,7 +209,7 @@ export default function ComponentShowcase() {
                   <Text variant="caption" className="mb-2">4 Column Grid</Text>
                   <Grid cols={4} gap="sm">
                     {[1, 2, 3, 4].map((num) => (
-                      <GridItem key={num} className="bg-gray-200 dark:bg-gray-700 p-4 rounded">
+                      <GridItem key={num} className="bg-gray-200 dark:bg-gray-700 p-4">
                         <Text variant="small">Col {num}</Text>
                       </GridItem>
                     ))}
@@ -260,23 +260,23 @@ export default function ComponentShowcase() {
               <Text variant="small" color="muted" className="mb-4">Primary Colors</Text>
               <div className="grid grid-cols-5 gap-4">
                 <div className="text-center">
-                  <div className="w-full h-20 bg-black rounded mb-2"></div>
+                  <div className="w-full h-20 bg-black mb-2"></div>
                   <Text variant="caption">#000000</Text>
                 </div>
                 <div className="text-center">
-                  <div className="w-full h-20 bg-white border rounded mb-2"></div>
+                  <div className="w-full h-20 bg-white border mb-2"></div>
                   <Text variant="caption">#FFFFFF</Text>
                 </div>
                 <div className="text-center">
-                  <div className="w-full h-20 bg-gray-800 rounded mb-2"></div>
+                  <div className="w-full h-20 bg-gray-800 mb-2"></div>
                   <Text variant="caption">#333333</Text>
                 </div>
                 <div className="text-center">
-                  <div className="w-full h-20 bg-gray-600 rounded mb-2"></div>
+                  <div className="w-full h-20 bg-gray-600 mb-2"></div>
                   <Text variant="caption">#666666</Text>
                 </div>
                 <div className="text-center">
-                  <div className="w-full h-20 bg-gray-400 rounded mb-2"></div>
+                  <div className="w-full h-20 bg-gray-400 mb-2"></div>
                   <Text variant="caption">#999999</Text>
                 </div>
               </div>
@@ -286,15 +286,15 @@ export default function ComponentShowcase() {
               <Text variant="small" color="muted" className="mb-4">Accent Colors</Text>
               <div className="grid grid-cols-3 gap-4">
                 <div className="text-center">
-                  <div className="w-full h-20 bg-gray-100 border rounded mb-2"></div>
+                  <div className="w-full h-20 bg-gray-100 border mb-2"></div>
                   <Text variant="caption">#F5F5F5</Text>
                 </div>
                 <div className="text-center">
-                  <div className="w-full h-20 bg-gray-200 rounded mb-2"></div>
+                  <div className="w-full h-20 bg-gray-200 mb-2"></div>
                   <Text variant="caption">#E8E8E8</Text>
                 </div>
                 <div className="text-center">
-                  <div className="w-full h-20 bg-gray-700 rounded mb-2"></div>
+                  <div className="w-full h-20 bg-gray-700 mb-2"></div>
                   <Text variant="caption">#2C2C2C</Text>
                 </div>
               </div>
@@ -465,14 +465,14 @@ export default function ComponentShowcase() {
           <div className="space-y-8">
             <div>
               <Text variant="small" color="muted" className="mb-4">Simple Footer</Text>
-              <div className="border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden">
+              <div className="border border-gray-200 dark:border-gray-700 overflow-hidden">
                 <Footer variant="simple" />
               </div>
             </div>
             
             <div>
               <Text variant="small" color="muted" className="mb-4">Detailed Footer</Text>
-              <div className="border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden">
+              <div className="border border-gray-200 dark:border-gray-700 overflow-hidden">
                 <Footer variant="detailed" />
               </div>
             </div>

@@ -97,7 +97,7 @@ export function ImageSlider({
       {/* Main image container */}
       <div
         className={cn(
-          'relative overflow-hidden rounded-lg bg-gray-100 dark:bg-gray-800',
+          'relative overflow-hidden bg-gray-100 dark:bg-gray-800',
           {
             'aspect-square': aspectRatio === 'square',
             'aspect-[4/3]': aspectRatio === '4:3',
@@ -133,7 +133,7 @@ export function ImageSlider({
         <>
           <button
             onClick={goToPrevious}
-            className="absolute left-2 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white p-2 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-200"
+            className="absolute left-2 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white p-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200"
             aria-label="Previous image"
           >
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -142,7 +142,7 @@ export function ImageSlider({
           </button>
           <button
             onClick={goToNext}
-            className="absolute right-2 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white p-2 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-200"
+            className="absolute right-2 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white p-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200"
             aria-label="Next image"
           >
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -160,7 +160,7 @@ export function ImageSlider({
               key={index}
               onClick={() => goToSlide(index)}
               className={cn(
-                'w-2 h-2 rounded-full transition-colors duration-200',
+                'w-2 h-2 transition-colors duration-200',
                 currentIndex === index
                   ? 'bg-black dark:bg-white'
                   : 'bg-gray-300 dark:bg-gray-600 hover:bg-gray-400 dark:hover:bg-gray-500'
@@ -179,7 +179,7 @@ export function ImageSlider({
               key={index}
               onClick={() => goToSlide(index)}
               className={cn(
-                'relative flex-shrink-0 w-16 h-16 rounded-md overflow-hidden border-2 transition-all duration-200',
+                'relative flex-shrink-0 w-16 h-16 overflow-hidden border-2 transition-all duration-200',
                 currentIndex === index
                   ? 'border-black dark:border-white scale-105'
                   : 'border-gray-200 dark:border-gray-700 hover:border-gray-400 dark:hover:border-gray-500'
@@ -201,7 +201,7 @@ export function ImageSlider({
       {autoPlay && images.length > 1 && (
         <button
           onClick={() => setIsPlaying(!isPlaying)}
-          className="absolute top-2 right-2 bg-black/50 hover:bg-black/70 text-white p-2 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-200"
+          className="absolute top-2 right-2 bg-black/50 hover:bg-black/70 text-white p-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200"
           aria-label={isPlaying ? 'Pause slideshow' : 'Play slideshow'}
         >
           {isPlaying ? (
@@ -218,7 +218,7 @@ export function ImageSlider({
 
       {/* Image counter */}
       {images.length > 1 && (
-        <div className="absolute top-2 left-2 bg-black/50 text-white px-2 py-1 rounded text-xs opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+        <div className="absolute top-2 left-2 bg-black/50 text-white px-2 py-1 text-xs opacity-0 group-hover:opacity-100 transition-opacity duration-200">
           {currentIndex + 1} / {images.length}
         </div>
       )}

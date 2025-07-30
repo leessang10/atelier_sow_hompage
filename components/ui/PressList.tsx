@@ -101,7 +101,7 @@ interface PressCardProps {
 
 function PressCard({ item, showImage, showExcerpt, linkPath }: PressCardProps) {
   const content = (
-    <article className="group bg-white dark:bg-gray-800 rounded-lg overflow-hidden shadow-md hover:shadow-lg transition-all duration-300 hover:-translate-y-1">
+    <article className="group bg-white dark:bg-gray-800 overflow-hidden shadow-md hover:shadow-lg transition-all duration-300 hover:-translate-y-1">
       {/* Featured Image */}
       {showImage && item.featured_image && (
         <div className="relative aspect-video overflow-hidden">
@@ -121,7 +121,7 @@ function PressCard({ item, showImage, showExcerpt, linkPath }: PressCardProps) {
         <div className="flex items-center justify-between mb-3">
           <div className="flex items-center space-x-2 text-xs text-gray-500 dark:text-gray-400">
             {item.category && (
-              <span className="bg-gray-100 dark:bg-gray-700 px-2 py-1 rounded">
+              <span className="bg-gray-100 dark:bg-gray-700 px-2 py-1">
                 {item.category}
               </span>
             )}
@@ -178,10 +178,10 @@ interface PressListItemProps {
 
 function PressListItem({ item, showImage, showExcerpt, linkPath }: PressListItemProps) {
   const content = (
-    <article className="group flex gap-4 p-4 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
+    <article className="group flex gap-4 p-4 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
       {/* Featured Image */}
       {showImage && item.featured_image && (
-        <div className="relative w-24 h-24 flex-shrink-0 overflow-hidden rounded-md">
+        <div className="relative w-24 h-24 flex-shrink-0 overflow-hidden">
           <Image
             src={item.featured_image}
             alt={item.title}
@@ -198,7 +198,7 @@ function PressListItem({ item, showImage, showExcerpt, linkPath }: PressListItem
         <div className="flex items-center justify-between mb-2">
           <div className="flex items-center space-x-2 text-xs text-gray-500 dark:text-gray-400">
             {item.category && (
-              <span className="bg-gray-100 dark:bg-gray-700 px-2 py-1 rounded">
+              <span className="bg-gray-100 dark:bg-gray-700 px-2 py-1">
                 {item.category}
               </span>
             )}
