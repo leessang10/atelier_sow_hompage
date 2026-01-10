@@ -1,4 +1,5 @@
 import type {Metadata} from "next";
+import Script from "next/script";
 import "./globals.css";
 import localFont from "next/font/local";
 import Footer from "../components/Footer";
@@ -20,6 +21,15 @@ const pretendard = localFont({
 export default function RootLayout({children}: Readonly<{children: React.ReactNode}>) {
     return (
         <html lang="ko" suppressHydrationWarning>
+        <head>
+            <Script async src="https://www.googletagmanager.com/gtag/js?id=G-DM6HR43M24"/>
+            <Script id="gtag-init" strategy="afterInteractive">
+                {`window.dataLayer = window.dataLayer || [];
+function gtag(){dataLayer.push(arguments);}
+gtag('js', new Date());
+gtag('config', 'G-DM6HR43M24');`}
+            </Script>
+        </head>
         <body className={`${pretendard.className} transition-colors`}>
         <ThemeProvider>
             <Navigation/>
