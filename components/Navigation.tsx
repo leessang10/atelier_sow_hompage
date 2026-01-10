@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import DesktopMenuItem from './navigation/DesktopMenuItem';
 import MobileMenu from './navigation/MobileMenu';
 import ThemeToggle from './ThemeToggle';
@@ -16,9 +16,25 @@ const menuItems = [
 
 export default function Navigation() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isScrolled, setIsScrolled] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 50);
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
   return (
-    <nav className={`fixed w-full z-50 transition-all duration-300 bg-transparent`}>
+    <nav 
+      className={`fixed w-full z-50 transition-all duration-300 ${
+        isScrolled 
+          ? 'bg-white/90 dark:bg-dark-bg/90 backdrop-blur-sm shadow-sm' 
+          : 'bg-transparent'
+      }`}
+    >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-20">
           <Link href="/" className="text-2xl font-bold text-gray-900 dark:text-white">
