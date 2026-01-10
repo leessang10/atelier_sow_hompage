@@ -124,7 +124,15 @@ export default function TiptapRenderer({ content }: TiptapRendererProps) {
       case 'image':
         return (
           <div key={key} className="mb-4">
-            <Image src={node.attrs?.src} alt={node.attrs?.alt || ''} className="max-w-full h-auto rounded-lg" />
+            <Image
+              src={node.attrs?.src}
+              alt={node.attrs?.alt || ''}
+              width={0}
+              height={0}
+              sizes="100vw"
+              style={{ width: '100%', height: 'auto' }}
+              className="rounded-lg"
+            />
           </div>
         );
 
