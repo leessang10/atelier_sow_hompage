@@ -103,7 +103,32 @@ export default function TiptapRenderer({ content }: TiptapRendererProps) {
       case 'listItem':
         return (
           <li key={key} className="ml-4">
-            {node.content?.map((child, i) => renderNode(child, i))}
+            {node.content?.map((child, i) => {
+              // Handle paragraph specifically to avoid <p> tag inside <li> and fix spacing/newline issues
+              if (child.type === 'paragraph') {
+                let contentToRender = child.content;
+
+                // Remove leading hyphen from the first text node of the first paragraph in a list item
+                if (i === 0 && contentToRender && contentToRender.length > 0) {
+                  const textNode = contentToRender[0];
+                  if (textNode.type === 'text' && textNode.text && textNode.text.trim().startsWith('-')) {
+                    const newText = textNode.text.replace(/^\s*-\s*/, '');
+                    contentToRender = [
+                      { ...textNode, text: newText },
+                      ...contentToRender.slice(1),
+                    ];
+                  }
+                }
+
+                // Render content directly inside a span instead of a p tag
+                return (
+                  <span key={`${key}-${i}`} className="text-gray-700 dark:text-gray-300">
+                    {contentToRender?.map((c, j) => renderNode(c, j))}
+                  </span>
+                );
+              }
+              return renderNode(child, i);
+            })}
           </li>
         );
 
