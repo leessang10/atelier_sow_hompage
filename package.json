@@ -13,6 +13,8 @@
   "dependencies": {
     "@supabase/supabase-js": "^2.49.10",
     "@vercel/blob": "^0.27.0",
+    "baseline-browser-mapping": "^2.9.14",
+    "caniuse-lite": "^1.0.30001763",
     "clsx": "^2.1.1",
     "dayjs": "^1.11.13",
     "framer-motion": "^11.15.0",
