@@ -94,7 +94,7 @@ export const getPressItemsByYear = async (year: string): Promise<SupabasePressIt
 
 // 새로운 문의 생성
 export const createContact = async (contactData: ContactFormData): Promise<SupabaseContact> => {
-  const { data, error } = await supabase.from('contact').insert([contactData]).select().single();
+  const { data, error } = await supabase.from('Contacts').insert([contactData]).select().single();
 
   if (error) {
     console.error('Error creating contact:', error);
@@ -106,7 +106,7 @@ export const createContact = async (contactData: ContactFormData): Promise<Supab
 
 // 모든 문의 목록 가져오기 (인증된 사용자용)
 export const getAllContacts = async (): Promise<SupabaseContact[]> => {
-  const { data, error } = await supabase.from('contact').select('*').order('created_at', { ascending: false });
+  const { data, error } = await supabase.from('Contacts').select('*').order('created_at', { ascending: false });
 
   if (error) {
     console.error('Error fetching contacts:', error);
@@ -118,7 +118,7 @@ export const getAllContacts = async (): Promise<SupabaseContact[]> => {
 
 // 특정 문의 가져오기 (인증된 사용자용)
 export const getContact = async (id: number): Promise<SupabaseContact | null> => {
-  const { data, error } = await supabase.from('contact').select('*').eq('id', id).single();
+  const { data, error } = await supabase.from('Contacts').select('*').eq('id', id).single();
 
   if (error) {
     console.error('Error fetching contact:', error);
@@ -135,7 +135,7 @@ export const updateContactStatus = async (id: number, status: SupabaseContact['s
     updates.is_read = isRead;
   }
 
-  const { data, error } = await supabase.from('contact').update(updates).eq('id', id).select().single();
+  const { data, error } = await supabase.from('Contacts').update(updates).eq('id', id).select().single();
 
   if (error) {
     console.error('Error updating contact status:', error);
@@ -147,7 +147,7 @@ export const updateContactStatus = async (id: number, status: SupabaseContact['s
 
 // 읽지 않은 문의 개수 가져오기 (인증된 사용자용)
 export const getUnreadContactCount = async (): Promise<number> => {
-  const { count, error } = await supabase.from('contact').select('*', { count: 'exact', head: true }).eq('is_read', false);
+  const { count, error } = await supabase.from('Contacts').select('*', { count: 'exact', head: true }).eq('is_read', false);
 
   if (error) {
     console.error('Error fetching unread contact count:', error);
