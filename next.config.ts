@@ -5,6 +5,11 @@ const nextConfig: NextConfig = {
   images: {
     remotePatterns: [
       {
+        protocol: 'https',
+        hostname: '**.supabase.co',
+        pathname: '/storage/v1/object/public/**',
+      },
+      {
         hostname: 'i.ytimg.com',
       },
       {
@@ -14,7 +19,6 @@ const nextConfig: NextConfig = {
         hostname: 'prod-files-secure.s3.us-west-2.amazonaws.com',
       },
     ],
-    unoptimized: true,
   },
 };
 

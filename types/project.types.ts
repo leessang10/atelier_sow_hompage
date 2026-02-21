@@ -22,7 +22,7 @@ export interface SupabaseProject {
   subtitle?: string;
   main_image: string;
   is_published: boolean;
-  body: any; // Tiptap JSON 형식
+  body?: any; // Tiptap JSON 형식
 }
 
 // Supabase contact 테이블용 타입

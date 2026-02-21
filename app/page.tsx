@@ -3,7 +3,7 @@ import { SupabaseProject } from '@/types/project.types';
 import ProjectSlider from '@/components/ProjectSlider';
 
 // 페이지 재검증 설정 (60초마다)
-export const revalidate = 60;
+export const revalidate = 300;
 
 export default async function Home() {
   let projects: SupabaseProject[] = [];

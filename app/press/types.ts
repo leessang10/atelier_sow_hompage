@@ -28,7 +28,7 @@ export interface SupabasePressItem {
   category: 'AWARD' | 'NEWS' | 'INTERVIEW' | 'EVENT';
   main_image: string;
   is_published: boolean;
-  body: any; // Tiptap JSON 형식
+  body?: any; // Tiptap JSON 형식
   published_date: string; // YYYY-MM-DD 형식
   source?: string;
   link?: string;

@@ -4,7 +4,7 @@ import PageHeader from '../../components/PageHeader';
 import { PressClient } from './PressClient';
 
 // 페이지 동적 설정 - Supabase 데이터가 실시간으로 변경될 수 있으므로 revalidate 설정
-export const revalidate = 60; // 60초마다 재검증
+export const revalidate = 300; // 5분마다 재검증
 
 export default async function Press() {
   let pressItems: SupabasePressItem[] = [];

@@ -3,12 +3,18 @@ import {ContactFormData, SupabaseContact, SupabaseProject} from '@/types/project
 import {createClient} from '@supabase/supabase-js';
 
 export const supabase = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!);
+const PROJECT_LIST_COLUMNS = 'id, created_at, title, subtitle, main_image, is_published';
+const PRESS_LIST_COLUMNS = 'id, created_at, title, subtitle, category, main_image, is_published, published_date, source, link, excerpt';
 
 // ========== Projects 관련 함수들 ==========
 
 // 발행된 프로젝트 목록 가져오기
 export async function getPublishedProjects(): Promise<SupabaseProject[]> {
-  const { data, error } = await supabase.from('Projects').select('*').eq('is_published', true).order('created_at', { ascending: false });
+  const { data, error } = await supabase
+    .from('Projects')
+    .select(PROJECT_LIST_COLUMNS)
+    .eq('is_published', true)
+    .order('created_at', { ascending: false });
 
   if (error) {
     console.error('Error fetching projects:', error);
@@ -38,7 +44,11 @@ export async function getProject(id: string): Promise<SupabaseProject | null> {
 
 // 발행된 보도자료 목록 가져오기
 export const getPublishedPressItems = async (): Promise<SupabasePressItem[]> => {
-  const { data, error } = await supabase.from('Press').select('*').eq('is_published', true).order('published_date', { ascending: false });
+  const { data, error } = await supabase
+    .from('Press')
+    .select(PRESS_LIST_COLUMNS)
+    .eq('is_published', true)
+    .order('published_date', { ascending: false });
 
   if (error) {
     console.error('Error fetching Press items:', error);
@@ -62,7 +72,12 @@ export const getPressItem = async (id: number): Promise<SupabasePressItem | null
 
 // 카테고리별 보도자료 가져오기
 export const getPressItemsByCategory = async (category: string): Promise<SupabasePressItem[]> => {
-  const { data, error } = await supabase.from('Press').select('*').eq('category', category).eq('is_published', true).order('published_date', { ascending: false });
+  const { data, error } = await supabase
+    .from('Press')
+    .select(PRESS_LIST_COLUMNS)
+    .eq('category', category)
+    .eq('is_published', true)
+    .order('published_date', { ascending: false });
 
   if (error) {
     console.error('Error fetching Press items by category:', error);
@@ -76,7 +91,7 @@ export const getPressItemsByCategory = async (category: string): Promise<Supabas
 export const getPressItemsByYear = async (year: string): Promise<SupabasePressItem[]> => {
   const { data, error } = await supabase
     .from('Press')
-    .select('*')
+    .select(PRESS_LIST_COLUMNS)
     .gte('published_date', `${year}-01-01`)
     .lte('published_date', `${year}-12-31`)
     .eq('is_published', true)
