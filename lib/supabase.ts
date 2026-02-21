@@ -4,7 +4,6 @@ import {createClient} from '@supabase/supabase-js';
 
 export const supabase = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!);
 const PROJECT_LIST_COLUMNS = 'id, created_at, title, subtitle, main_image, is_published';
-const PRESS_LIST_COLUMNS = 'id, created_at, title, subtitle, category, main_image, is_published, published_date, source, link, excerpt';
 
 // ========== Projects 관련 함수들 ==========
 
@@ -46,7 +45,7 @@ export async function getProject(id: string): Promise<SupabaseProject | null> {
 export const getPublishedPressItems = async (): Promise<SupabasePressItem[]> => {
   const { data, error } = await supabase
     .from('Press')
-    .select(PRESS_LIST_COLUMNS)
+    .select('*')
     .eq('is_published', true)
     .order('published_date', { ascending: false });
 
@@ -74,7 +73,7 @@ export const getPressItem = async (id: number): Promise<SupabasePressItem | null
 export const getPressItemsByCategory = async (category: string): Promise<SupabasePressItem[]> => {
   const { data, error } = await supabase
     .from('Press')
-    .select(PRESS_LIST_COLUMNS)
+    .select('*')
     .eq('category', category)
     .eq('is_published', true)
     .order('published_date', { ascending: false });
@@ -91,7 +90,7 @@ export const getPressItemsByCategory = async (category: string): Promise<Supabas
 export const getPressItemsByYear = async (year: string): Promise<SupabasePressItem[]> => {
   const { data, error } = await supabase
     .from('Press')
-    .select(PRESS_LIST_COLUMNS)
+    .select('*')
     .gte('published_date', `${year}-01-01`)
     .lte('published_date', `${year}-12-31`)
     .eq('is_published', true)
