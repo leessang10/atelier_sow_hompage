@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import { isSupabaseStorageUrl } from '@/lib/image';
 import { TiptapDocument, TiptapNode } from '@/types/project.types';
 import Image from 'next/image';
 
@@ -157,6 +158,7 @@ export default function TiptapRenderer({ content }: TiptapRendererProps) {
               sizes="100vw"
               style={{ width: '100%', height: 'auto' }}
               className="rounded-lg"
+              unoptimized={isSupabaseStorageUrl(node.attrs?.src)}
             />
           </div>
         );

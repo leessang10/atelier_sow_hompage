@@ -1,6 +1,7 @@
 import { forwardRef, HTMLAttributes } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
+import { isSupabaseStorageUrl } from '@/lib/image';
 import { cn } from '@/lib/utils';
 
 interface Project {
@@ -123,6 +124,7 @@ function ProjectCard({
             }
           )}
           sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+          unoptimized={isSupabaseStorageUrl(project.main_image)}
         />
         
         {/* Overlay */}

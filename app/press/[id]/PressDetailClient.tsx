@@ -3,6 +3,7 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import TiptapRenderer from '@/components/TiptapRenderer';
+import { isSupabaseStorageUrl } from '@/lib/image';
 import { SupabasePressItem } from '../types';
 
 interface PressDetailClientProps {
@@ -48,6 +49,7 @@ export default function PressDetailClient({ pressItem }: PressDetailClientProps)
                 sizes="(max-width: 1024px) 100vw, 896px"
                 className="object-cover"
                 priority
+                unoptimized={isSupabaseStorageUrl(pressItem.main_image)}
               />
             </div>
           </div>

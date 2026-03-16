@@ -2,6 +2,7 @@
 
 import CustomNextButton from '@/components/slider/CustomNextButton';
 import CustomPrevButton from '@/components/slider/CustomPrevButton';
+import { isSupabaseStorageUrl } from '@/lib/image';
 import { SupabaseProject } from '@/types/project.types';
 import { motion, AnimatePresence } from 'framer-motion';
 import Image from 'next/image';
@@ -63,6 +64,7 @@ export default function ProjectSlider({ projects }: ProjectSliderProps) {
                     style={{ objectFit: 'cover' }}
                     sizes="100vw"
                     priority={index === 0}
+                    unoptimized={isSupabaseStorageUrl(project.main_image)}
                   />
                </motion.div>
             </div>
