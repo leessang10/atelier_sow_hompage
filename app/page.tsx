@@ -2,8 +2,8 @@ import { getPublishedProjects } from '@/lib/supabase';
 import { SupabaseProject } from '@/types/project.types';
 import ProjectSlider from '@/components/ProjectSlider';
 
-// 페이지 재검증 설정 (60초마다)
-export const revalidate = 60;
+// 공개 포트폴리오는 자주 바뀌지 않으므로 재검증 빈도를 낮춘다.
+export const revalidate = 3600;
 
 export default async function Home() {
   let projects: SupabaseProject[] = [];

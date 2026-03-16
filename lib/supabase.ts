@@ -1,14 +1,21 @@
 import {SupabasePressItem} from '@/app/press/types';
 import {ContactFormData, SupabaseContact, SupabaseProject} from '@/types/project.types';
 import {createClient} from '@supabase/supabase-js';
+import { cache } from 'react';
 
 export const supabase = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!);
 
-// ========== Projects 관련 함수들 ==========
+const PROJECT_LIST_SELECT = 'id, created_at, title, subtitle, main_image, is_published';
+const PROJECT_DETAIL_SELECT = `${PROJECT_LIST_SELECT}, body`;
+const PRESS_LIST_SELECT = 'id, created_at, title, category, main_image:thumbnail, is_published, published_date, source, link, excerpt';
+const PRESS_DETAIL_SELECT = `${PRESS_LIST_SELECT}, body:content`;
 
-// 발행된 프로젝트 목록 가져오기
-export async function getPublishedProjects(): Promise<SupabaseProject[]> {
-  const { data, error } = await supabase.from('Projects').select('*').eq('is_published', true).order('created_at', { ascending: false });
+const fetchPublishedProjects = cache(async (): Promise<SupabaseProject[]> => {
+  const { data, error } = await supabase
+    .from('Projects')
+    .select(PROJECT_LIST_SELECT)
+    .eq('is_published', true)
+    .order('created_at', { ascending: false });
 
   if (error) {
     console.error('Error fetching projects:', error);
@@ -16,15 +23,18 @@ export async function getPublishedProjects(): Promise<SupabaseProject[]> {
   }
 
   return data || [];
-}
+});
 
-// 특정 프로젝트 가져오기
-export async function getProject(id: string): Promise<SupabaseProject | null> {
-  const { data, error } = await supabase.from('Projects').select('*').eq('id', parseInt(id)).eq('is_published', true).single();
+const fetchProject = cache(async (id: string): Promise<SupabaseProject | null> => {
+  const { data, error } = await supabase
+    .from('Projects')
+    .select(PROJECT_DETAIL_SELECT)
+    .eq('id', parseInt(id))
+    .eq('is_published', true)
+    .single();
 
   if (error) {
     if (error.code === 'PGRST116') {
-      // 데이터를 찾을 수 없음
       return null;
     }
     console.error('Error fetching project:', error);
@@ -32,13 +42,14 @@ export async function getProject(id: string): Promise<SupabaseProject | null> {
   }
 
   return data;
-}
+});
 
-// ========== Press 관련 함수들 ==========
-
-// 발행된 보도자료 목록 가져오기
-export const getPublishedPressItems = async (): Promise<SupabasePressItem[]> => {
-  const { data, error } = await supabase.from('Press').select('*').eq('is_published', true).order('published_date', { ascending: false });
+const fetchPublishedPressItems = cache(async (): Promise<SupabasePressItem[]> => {
+  const { data, error } = await supabase
+    .from('Press')
+    .select(PRESS_LIST_SELECT)
+    .eq('is_published', true)
+    .order('published_date', { ascending: false });
 
   if (error) {
     console.error('Error fetching Press items:', error);
@@ -46,18 +57,49 @@ export const getPublishedPressItems = async (): Promise<SupabasePressItem[]> => 
   }
 
   return data || [];
-};
+});
 
-// 특정 보도자료 가져오기
-export const getPressItem = async (id: number): Promise<SupabasePressItem | null> => {
-  const { data, error } = await supabase.from('Press').select('*').eq('id', id).eq('is_published', true).single();
+const fetchPressItem = cache(async (id: number): Promise<SupabasePressItem | null> => {
+  const { data, error } = await supabase
+    .from('Press')
+    .select(PRESS_DETAIL_SELECT)
+    .eq('id', id)
+    .eq('is_published', true)
+    .single();
 
   if (error) {
+    if (error.code === 'PGRST116') {
+      return null;
+    }
     console.error('Error fetching Press item:', error);
     return null;
   }
 
   return data;
+});
+
+// ========== Projects 관련 함수들 ==========
+
+// 발행된 프로젝트 목록 가져오기
+export async function getPublishedProjects(): Promise<SupabaseProject[]> {
+  return fetchPublishedProjects();
+}
+
+// 특정 프로젝트 가져오기
+export async function getProject(id: string): Promise<SupabaseProject | null> {
+  return fetchProject(id);
+}
+
+// ========== Press 관련 함수들 ==========
+
+// 발행된 보도자료 목록 가져오기
+export const getPublishedPressItems = async (): Promise<SupabasePressItem[]> => {
+  return fetchPublishedPressItems();
+};
+
+// 특정 보도자료 가져오기
+export const getPressItem = async (id: number): Promise<SupabasePressItem | null> => {
+  return fetchPressItem(id);
 };
 
 // 카테고리별 보도자료 가져오기

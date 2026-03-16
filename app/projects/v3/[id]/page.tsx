@@ -10,6 +10,8 @@ interface ProjectDetailProps {
   params: Promise<{ id: string }>;
 }
 
+export const revalidate = 3600;
+
 // 동적 메타데이터 생성
 export async function generateMetadata({ params }: ProjectDetailProps) {
   const { id } = await params;

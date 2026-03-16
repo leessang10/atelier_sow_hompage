@@ -9,6 +9,8 @@ interface PageProps {
   }>;
 }
 
+export const revalidate = 3600;
+
 // 메타데이터 생성
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { id } = await params;
