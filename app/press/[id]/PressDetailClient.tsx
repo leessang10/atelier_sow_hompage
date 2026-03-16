@@ -41,7 +41,14 @@ export default function PressDetailClient({ pressItem }: PressDetailClientProps)
         {pressItem.main_image && (
           <div className="mb-8">
             <div className="aspect-video relative overflow-hidden rounded-lg">
-              <Image src={pressItem.main_image} alt={pressItem.title} fill className="object-cover" priority />
+              <Image
+                src={pressItem.main_image}
+                alt={pressItem.title}
+                fill
+                sizes="(max-width: 1024px) 100vw, 896px"
+                className="object-cover"
+                priority
+              />
             </div>
           </div>
         )}

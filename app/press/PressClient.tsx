@@ -114,6 +114,7 @@ export function PressClient({ initialPressItems }: PressClientProps) {
                                         src={item.main_image} 
                                         alt={item.title} 
                                         fill 
+                                        sizes="(max-width: 768px) 100vw, 280px"
                                         className="object-cover group-hover:scale-105 transition-transform duration-500 ease-out" 
                                     />
                                 ) : (
