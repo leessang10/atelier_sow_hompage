@@ -4,6 +4,7 @@ import { useState, useMemo } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { motion } from 'framer-motion';
+import { isSupabaseStorageUrl } from '@/lib/image';
 import { SupabasePressItem, PressFilter as PressFilterType } from './types';
 import PressFilter from './PressFilter';
 
@@ -114,6 +115,8 @@ export function PressClient({ initialPressItems }: PressClientProps) {
                                         src={item.main_image} 
                                         alt={item.title} 
                                         fill 
+                                        sizes="(max-width: 768px) 100vw, 280px"
+                                        unoptimized={isSupabaseStorageUrl(item.main_image)}
                                         className="object-cover group-hover:scale-105 transition-transform duration-500 ease-out" 
                                     />
                                 ) : (

@@ -1,4 +1,5 @@
 import { getProject } from '@/lib/supabase';
+import { isSupabaseStorageUrl } from '@/lib/image';
 import { SupabaseProject } from '@/types/project.types';
 import PageHeader from '@/components/PageHeader';
 import TiptapRenderer from '@/components/TiptapRenderer';
@@ -9,6 +10,8 @@ import { notFound } from 'next/navigation';
 interface ProjectDetailProps {
   params: Promise<{ id: string }>;
 }
+
+export const revalidate = 3600;
 
 // 동적 메타데이터 생성
 export async function generateMetadata({ params }: ProjectDetailProps) {
@@ -82,7 +85,15 @@ export default async function ProjectDetail({ params }: ProjectDetailProps) {
 
       {/* 메인 이미지 */}
       <div className="relative aspect-video w-full mb-16 bg-gray-100 dark:bg-gray-800 overflow-hidden">
-        <Image src={project.main_image} alt={project.title} fill sizes="100vw" style={{ objectFit: 'cover', objectPosition: 'center' }} priority />
+        <Image
+          src={project.main_image}
+          alt={project.title}
+          fill
+          sizes="100vw"
+          style={{ objectFit: 'cover', objectPosition: 'center' }}
+          priority
+          unoptimized={isSupabaseStorageUrl(project.main_image)}
+        />
       </div>
 
       <div className="container mx-auto px-4 lg:px-8 pb-20 flex flex-col lg:flex-row gap-8 relative">

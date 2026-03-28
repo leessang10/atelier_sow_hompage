@@ -2,6 +2,7 @@
 
 import { useState, useRef, useEffect } from 'react';
 import Image from 'next/image';
+import { isSupabaseStorageUrl } from '@/lib/image';
 import { cn } from '@/lib/utils';
 
 interface ImageSliderProps {
@@ -116,6 +117,7 @@ export function ImageSlider({
           className="object-cover transition-opacity duration-500"
           sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
           priority={currentIndex === 0}
+          unoptimized={isSupabaseStorageUrl(images[currentIndex].src)}
         />
         
         {/* Caption overlay */}
@@ -191,6 +193,7 @@ export function ImageSlider({
                 fill
                 className="object-cover"
                 sizes="64px"
+                unoptimized={isSupabaseStorageUrl(image.src)}
               />
             </button>
           ))}

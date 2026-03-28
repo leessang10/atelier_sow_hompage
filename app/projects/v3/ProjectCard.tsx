@@ -1,5 +1,6 @@
 'use client';
 
+import { isSupabaseStorageUrl } from '@/lib/image';
 import { SupabaseProject } from '@/types/project.types';
 import { motion } from 'framer-motion';
 import Image from 'next/image';
@@ -23,7 +24,8 @@ export default function ProjectCard({ project }: ProjectCardProps) {
           alt={project.title}
           fill
           style={{ objectFit: 'cover', objectPosition: 'center' }}
-          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 75vw, 50vw"
+          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+          unoptimized={isSupabaseStorageUrl(project.main_image)}
           className="object-cover group-hover:scale-105 transition-transform duration-300"
         />
         <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 transition-opacity duration-300">

@@ -3,6 +3,8 @@ import { getPublishedPressItems, getPublishedProjects } from '@/lib/supabase';
 import { SupabaseProject } from '@/types/project.types';
 import { MetadataRoute } from 'next';
 
+export const revalidate = 3600;
+
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const baseUrl = 'https://www.ateliersow.com';
 
