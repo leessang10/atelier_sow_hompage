@@ -23,6 +23,25 @@ body {
   color: var(--foreground);
   background: var(--background);
   font-family: var(--font-family); /* Pretendard를 포함한 폰트 적용 */
+  text-rendering: geometricPrecision;
+  -webkit-font-smoothing: antialiased;
+}
+
+::selection {
+  background: #171717;
+  color: #f6f4ef;
+}
+
+@layer components {
+  .sow-kicker {
+    @apply text-[12px] font-medium leading-none tracking-[0.055em] text-neutral-500;
+    text-transform: none;
+  }
+
+  .sow-kicker-on-image {
+    @apply text-[12px] font-medium leading-none tracking-[0.055em] text-white/70;
+    text-transform: none;
+  }
 }
 
 /* Tiptap 콘텐츠를 위한 추가 스타일 */

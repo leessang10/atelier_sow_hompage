@@ -6,6 +6,7 @@ import { cache } from 'react';
 export const supabase = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!);
 
 const PROJECT_LIST_SELECT = 'id, created_at, title, subtitle, main_image, is_published';
+const PROJECT_ARCHIVE_SELECT = `${PROJECT_LIST_SELECT}, body`;
 const PROJECT_DETAIL_SELECT = `${PROJECT_LIST_SELECT}, body`;
 const PRESS_LIST_SELECT = 'id, created_at, title, category, main_image:thumbnail, is_published, published_date, source, link, excerpt';
 const PRESS_DETAIL_SELECT = `${PRESS_LIST_SELECT}, body:content`;
@@ -19,6 +20,21 @@ const fetchPublishedProjects = cache(async (): Promise<SupabaseProject[]> => {
 
   if (error) {
     console.error('Error fetching projects:', error);
+    throw new Error('프로젝트를 불러오는데 실패했습니다.');
+  }
+
+  return data || [];
+});
+
+const fetchPublishedProjectArchive = cache(async (): Promise<SupabaseProject[]> => {
+  const { data, error } = await supabase
+    .from('Projects')
+    .select(PROJECT_ARCHIVE_SELECT)
+    .eq('is_published', true)
+    .order('created_at', { ascending: false });
+
+  if (error) {
+    console.error('Error fetching project archive:', error);
     throw new Error('프로젝트를 불러오는데 실패했습니다.');
   }
 
@@ -83,6 +99,11 @@ const fetchPressItem = cache(async (id: number): Promise<SupabasePressItem | nul
 // 발행된 프로젝트 목록 가져오기
 export async function getPublishedProjects(): Promise<SupabaseProject[]> {
   return fetchPublishedProjects();
+}
+
+// 홈페이지 캔버스용 프로젝트 목록 가져오기
+export async function getPublishedProjectArchive(): Promise<SupabaseProject[]> {
+  return fetchPublishedProjectArchive();
 }
 
 // 특정 프로젝트 가져오기

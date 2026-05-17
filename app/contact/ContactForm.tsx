@@ -74,15 +74,15 @@ export default function ContactForm({ submitAction }: ContactFormProps) {
   };
 
   return (
-    <motion.form onSubmit={handleSubmit} className="space-y-6" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }}>
+    <motion.form onSubmit={handleSubmit} className="space-y-10" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }}>
       {error && (
-        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-700 rounded-md">
-          <p className="text-red-700 dark:text-red-300 text-center">{error}</p>
+        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="border-t border-red-700/40 pt-5">
+          <p className="text-sm text-red-700">{error}</p>
         </motion.div>
       )}
 
       <div>
-        <label htmlFor="name" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+        <label htmlFor="name" className="sow-kicker mb-3 block">
           이름 *
         </label>
         <input
@@ -91,14 +91,14 @@ export default function ContactForm({ submitAction }: ContactFormProps) {
           name="name"
           value={formData.name}
           onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-          className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-dark-card dark:text-white"
+          className="w-full border-0 border-b border-neutral-950/25 bg-transparent px-0 py-4 text-2xl font-light text-neutral-950 outline-none transition-colors placeholder:text-neutral-400 focus:border-neutral-950 disabled:opacity-50"
           required
           disabled={isPending}
         />
       </div>
 
       <div>
-        <label htmlFor="email" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+        <label htmlFor="email" className="sow-kicker mb-3 block">
           이메일 *
         </label>
         <input
@@ -107,14 +107,14 @@ export default function ContactForm({ submitAction }: ContactFormProps) {
           name="email"
           value={formData.email}
           onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-          className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-dark-card dark:text-white"
+          className="w-full border-0 border-b border-neutral-950/25 bg-transparent px-0 py-4 text-2xl font-light text-neutral-950 outline-none transition-colors placeholder:text-neutral-400 focus:border-neutral-950 disabled:opacity-50"
           required
           disabled={isPending}
         />
       </div>
 
       <div>
-        <label htmlFor="phone" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+        <label htmlFor="phone" className="sow-kicker mb-3 block">
           연락처
         </label>
         <input
@@ -123,14 +123,14 @@ export default function ContactForm({ submitAction }: ContactFormProps) {
           name="phone"
           value={formData.phone || ''}
           onChange={(e) => setFormData({ ...formData, phone: formatPhoneNumber(e.target.value) || undefined })}
-          className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-dark-card dark:text-white"
+          className="w-full border-0 border-b border-neutral-950/25 bg-transparent px-0 py-4 text-2xl font-light text-neutral-950 outline-none transition-colors placeholder:text-neutral-400 focus:border-neutral-950 disabled:opacity-50"
           maxLength={13}
           disabled={isPending}
         />
       </div>
 
       <div>
-        <label htmlFor="message" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+        <label htmlFor="message" className="sow-kicker mb-3 block">
           문의내용 *
         </label>
         <textarea
@@ -139,7 +139,7 @@ export default function ContactForm({ submitAction }: ContactFormProps) {
           rows={6}
           value={formData.message}
           onChange={(e) => setFormData({ ...formData, message: e.target.value })}
-          className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-dark-card dark:text-white"
+          className="w-full resize-none border-0 border-b border-neutral-950/25 bg-transparent px-0 py-4 text-2xl font-light leading-relaxed text-neutral-950 outline-none transition-colors placeholder:text-neutral-400 focus:border-neutral-950 disabled:opacity-50"
           required
           disabled={isPending}
         />
@@ -147,7 +147,7 @@ export default function ContactForm({ submitAction }: ContactFormProps) {
 
       <button
         type="submit"
-        className="w-full bg-black dark:bg-white text-white dark:text-black py-3 px-6 rounded-md hover:bg-gray-800 dark:hover:bg-gray-100 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+        className="inline-flex min-h-14 items-center justify-center rounded-none bg-neutral-950 px-8 text-xs uppercase tracking-[0.22em] text-white transition-opacity hover:opacity-80 disabled:cursor-not-allowed disabled:opacity-50"
         disabled={isPending}
       >
         {isPending ? '전송 중...' : '문의하기'}

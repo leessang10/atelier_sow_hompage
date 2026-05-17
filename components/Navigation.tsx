@@ -1,108 +1,124 @@
 'use client';
 
+import { AnimatePresence, motion } from 'framer-motion';
 import Link from 'next/link';
-import { useEffect, useState } from 'react';
-import { motion, useScroll, useSpring } from 'framer-motion';
-import DesktopMenuItem from './navigation/DesktopMenuItem';
-import MobileMenu from './navigation/MobileMenu';
-import ThemeToggle from './ThemeToggle';
+import { usePathname } from 'next/navigation';
+import { useRef, useState } from 'react';
 
 const menuItems = [
-  { href: '/about', text: 'About' },
-  { href: '/projects/v3', text: 'Projects' },
-  { href: '/press', text: 'Press' },
-  { href: '/process', text: 'Process' },
+  { href: '/about', text: 'Profile' },
   { href: '/contact', text: 'Contact' },
 ];
 
+const projects = [
+  { href: '/projects/v3/10', text: 'Cafe Milling' },
+  { href: '/projects/v3/9', text: 'Donut Drawing x Crack Crack' },
+  { href: '/projects/v3/8', text: 'Booba House' },
+  { href: '/projects/v3/7', text: 'Cozimory' },
+  { href: '/projects/v3/6', text: 'Jukyo Station' },
+  { href: '/projects/v3/4', text: 'Arirang Dowon' },
+  { href: '/projects/v3/3', text: 'Pipit Burger' },
+  { href: '/projects/v3/2', text: 'Jang Jung Jung' },
+  { href: '/projects/v3/1', text: 'Wooadang' },
+];
+
 export default function Navigation() {
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [isScrolled, setIsScrolled] = useState(false);
+  const pathname = usePathname();
+  const [isProjectsOpen, setIsProjectsOpen] = useState(false);
+  const closeTimer = useRef<number | null>(null);
+  const isHome = pathname === '/';
 
-  const { scrollYProgress } = useScroll();
-  const scaleX = useSpring(scrollYProgress, {
-    stiffness: 100,
-    damping: 30,
-    restDelta: 0.001
-  });
+  const clearCloseTimer = () => {
+    if (closeTimer.current) {
+      window.clearTimeout(closeTimer.current);
+      closeTimer.current = null;
+    }
+  };
 
-  useEffect(() => {
-    const handleScroll = () => {
-      setIsScrolled(window.scrollY > 50);
-    };
+  const openProjects = () => {
+    clearCloseTimer();
+    setIsProjectsOpen(true);
+  };
 
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
+  const scheduleCloseProjects = () => {
+    clearCloseTimer();
+    closeTimer.current = window.setTimeout(() => {
+      setIsProjectsOpen(false);
+    }, 220);
+  };
 
   return (
-    <nav 
-      className={`fixed w-full z-50 transition-all duration-500 ${
-        isScrolled 
-          ? 'bg-white/90 dark:bg-dark-bg/90 backdrop-blur-md shadow-sm h-16' 
-          : 'bg-transparent h-24'
-      }`}
-    >
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-full">
-        <div className="flex justify-between items-center h-full">
-          {/* Dynamic Logo */}
-          <Link href="/" className="relative z-50 group">
-             <div className="flex items-center gap-2">
-                 <motion.span 
-                    initial={false}
-                    animate={{ 
-                        fontSize: isScrolled ? "1.25rem" : "1.5rem",
-                        fontWeight: isScrolled ? 700 : 800 
-                    }}
-                    className="text-gray-900 dark:text-white tracking-tight transition-colors"
-                 >
-                    {isScrolled ? "A.SOW" : "Atelier Sow"}
-                 </motion.span>
-             </div>
-          </Link>
-
-          {/* Desktop Menu */}
-          <div className="hidden md:flex items-center gap-8">
-            {menuItems.map((item) => (
-              <DesktopMenuItem key={item.href} href={item.href} text={item.text} />
-            ))}
-            <ThemeToggle />
-          </div>
-
-          {/* Mobile Menu Button */}
-          <div className="md:hidden flex items-center gap-4">
-            <ThemeToggle />
-            <button 
-                onClick={() => setIsMenuOpen(!isMenuOpen)} 
-                className="text-gray-900 dark:text-white p-2 focus:outline-none z-50"
+    <header className="fixed left-1/2 top-6 z-50 -translate-x-1/2 text-white">
+      <div className="relative" onMouseEnter={clearCloseTimer} onMouseLeave={scheduleCloseProjects}>
+        <div className="rounded-[8px] bg-[rgba(13,14,13,0.9)] px-2 py-2 shadow-[0_18px_50px_rgba(0,0,0,0.22)] backdrop-blur-md">
+          <div className="flex items-center gap-1">
+            <Link
+              href="/"
+              className="grid size-10 place-items-center rounded-[5px] font-serif text-lg text-[#b6a27d] transition-colors hover:bg-white/10"
+              aria-label="Atelier SOW home"
             >
-              <div className="w-6 h-5 relative flex flex-col justify-between">
-                  <motion.span 
-                    animate={isMenuOpen ? { rotate: 45, y: 9 } : { rotate: 0, y: 0 }}
-                    className="w-full h-0.5 bg-current origin-left transition-all"
-                  />
-                  <motion.span 
-                    animate={isMenuOpen ? { opacity: 0 } : { opacity: 1 }}
-                    className="w-full h-0.5 bg-current transition-all"
-                  />
-                  <motion.span 
-                    animate={isMenuOpen ? { rotate: -45, y: -9 } : { rotate: 0, y: 0 }}
-                    className="w-full h-0.5 bg-current origin-left transition-all"
-                  />
-              </div>
+              S
+            </Link>
+
+            <button
+              type="button"
+              className="h-10 rounded-[5px] px-4 text-[11px] uppercase tracking-[0.16em] text-white/82 transition-colors hover:bg-white/10 hover:text-white"
+              onMouseEnter={openProjects}
+              onClick={() => setIsProjectsOpen((value) => !value)}
+              aria-expanded={isProjectsOpen}
+            >
+              Projects
             </button>
+
+            <nav className="flex items-center gap-1">
+              {menuItems.map((item) => (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  className="grid h-10 place-items-center rounded-[5px] px-4 text-[11px] uppercase tracking-[0.16em] text-white/82 transition-colors hover:bg-white/10 hover:text-white"
+                >
+                  {item.text}
+                </Link>
+              ))}
+            </nav>
           </div>
-
-          {/* Mobile Menu Overlay */}
-          <MobileMenu isOpen={isMenuOpen} onClose={() => setIsMenuOpen(false)} menuItems={menuItems} />
         </div>
-      </div>
 
-      {/* Reading Progress Bar */}
-      <motion.div
-        className="absolute bottom-0 left-0 right-0 h-[2px] bg-gray-900 dark:bg-white origin-left"
-        style={{ scaleX }}
-      />
-    </nav>
+        <AnimatePresence>
+          {isProjectsOpen ? (
+            <motion.div
+              className="absolute left-0 right-0 top-full pt-3"
+              onMouseEnter={openProjects}
+              onMouseLeave={scheduleCloseProjects}
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+              transition={{ duration: 0.24, ease: [0.22, 1, 0.36, 1] }}
+            >
+              <motion.nav
+                className="overflow-hidden rounded-[8px] bg-[rgba(13,14,13,0.9)] text-white shadow-[0_20px_50px_rgba(0,0,0,0.24)] backdrop-blur-md"
+                initial={{ height: 0 }}
+                animate={{ height: 'auto' }}
+                exit={{ height: 0 }}
+                transition={{ duration: 0.34, ease: [0.22, 1, 0.36, 1] }}
+              >
+                {projects.map((item) => (
+                  <Link
+                    key={item.href}
+                    href={item.href}
+                    className="block border-t border-white/8 px-4 py-3 text-[12px] text-white/78 transition-colors hover:bg-white/10 hover:text-white"
+                    onClick={() => setIsProjectsOpen(false)}
+                  >
+                    {item.text}
+                  </Link>
+                ))}
+              </motion.nav>
+            </motion.div>
+          ) : null}
+        </AnimatePresence>
+
+        {!isHome ? null : null}
+      </div>
+    </header>
   );
 }

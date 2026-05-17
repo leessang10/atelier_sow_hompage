@@ -1,0 +1,441 @@
+'use client';
+
+import { getCanvasProjectPosition, getProjectYear } from '@/entities/project/lib/archive-layout';
+import { ProjectCanvasItem, buildProjectCanvasItems } from '@/entities/project/lib/project-canvas-items';
+import { isSupabaseStorageUrl } from '@/lib/image';
+import { SupabaseProject } from '@/types/project.types';
+import { MotionValue, animate, motion, useMotionValue, useTransform } from 'framer-motion';
+import Image from 'next/image';
+import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import { MouseEvent, PointerEvent, WheelEvent, useMemo, useRef, useState } from 'react';
+
+interface HomeArchiveProps {
+  projects: SupabaseProject[];
+}
+
+const CANVAS_WIDTH = 4200;
+const CANVAS_HEIGHT = 3000;
+const BOUNDS = {
+  left: -3100,
+  right: 240,
+  top: -2240,
+  bottom: 260,
+};
+const DETAIL_TRANSITION_MS = 980;
+const DETAIL_TRANSITION_KEY = 'atelier-sow-project-transition';
+
+interface DetailTransitionState {
+  href: string;
+  image: string;
+  projectId: number;
+  rect: {
+    height: number;
+    left: number;
+    top: number;
+    width: number;
+  };
+  title: string;
+}
+
+function clamp(value: number, min: number, max: number) {
+  return Math.min(Math.max(value, min), max);
+}
+
+function clampVelocity(value: number) {
+  return clamp(value, -900, 900);
+}
+
+function getCanvasLayer(index: number) {
+  return index % 5 === 0 || index % 5 === 2 ? 'foreground' : 'background';
+}
+
+export function HomeArchive({ projects }: HomeArchiveProps) {
+  const router = useRouter();
+  const x = useMotionValue(-1460);
+  const y = useMotionValue(-1060);
+  const cursorX = useMotionValue(0);
+  const cursorY = useMotionValue(0);
+  const [hoveredItem, setHoveredItem] = useState<ProjectCanvasItem | null>(null);
+  const [detailTransition, setDetailTransition] = useState<DetailTransitionState | null>(null);
+  const dragState = useRef({
+    active: false,
+    baseX: 0,
+    baseY: 0,
+    lastTime: 0,
+    lastX: 0,
+    lastY: 0,
+    startX: 0,
+    startY: 0,
+    velocityX: 0,
+    velocityY: 0,
+  });
+
+  const canvasItems = useMemo(() => buildProjectCanvasItems(projects), [projects]);
+  const canvasProjects = useMemo(
+    () =>
+      canvasItems.map((item, index) => ({
+        index,
+        item,
+        layer: getCanvasLayer(index),
+        position: getCanvasProjectPosition(index),
+      })),
+    [canvasItems]
+  );
+  const backgroundProjects = canvasProjects.filter((project) => project.layer === 'background');
+  const foregroundProjects = canvasProjects.filter((project) => project.layer === 'foreground');
+
+  if (!canvasItems.length) {
+    return (
+      <main className="grid h-screen place-items-center overflow-hidden bg-[#e9e5dc] text-neutral-950">
+        <p className="text-xs uppercase tracking-[0.22em] text-neutral-500">No published projects</p>
+      </main>
+    );
+  }
+
+  const handlePointerDown = (event: PointerEvent<HTMLElement>) => {
+    dragState.current = {
+      active: true,
+      baseX: x.get(),
+      baseY: y.get(),
+      lastTime: performance.now(),
+      lastX: event.clientX,
+      lastY: event.clientY,
+      startX: event.clientX,
+      startY: event.clientY,
+      velocityX: 0,
+      velocityY: 0,
+    };
+    event.currentTarget.setPointerCapture(event.pointerId);
+  };
+
+  const handlePointerMove = (event: PointerEvent<HTMLElement>) => {
+    cursorX.set(event.clientX + 18);
+    cursorY.set(event.clientY + 18);
+
+    const hoveredCard = document.elementFromPoint(event.clientX, event.clientY)?.closest<HTMLElement>('article[data-canvas-item-id]');
+    const hoveredId = hoveredCard?.dataset.canvasItemId ?? null;
+    const nextHoveredItem = hoveredId ? canvasItems.find((item) => item.id === hoveredId) ?? null : null;
+    setHoveredItem(nextHoveredItem);
+
+    if (!dragState.current.active) {
+      return;
+    }
+
+    const nextX = dragState.current.baseX + event.clientX - dragState.current.startX;
+    const nextY = dragState.current.baseY + event.clientY - dragState.current.startY;
+    const now = performance.now();
+    const elapsed = Math.max(now - dragState.current.lastTime, 16);
+
+    dragState.current.velocityX = ((event.clientX - dragState.current.lastX) / elapsed) * 1000;
+    dragState.current.velocityY = ((event.clientY - dragState.current.lastY) / elapsed) * 1000;
+    dragState.current.lastX = event.clientX;
+    dragState.current.lastY = event.clientY;
+    dragState.current.lastTime = now;
+
+    x.set(clamp(nextX, BOUNDS.left, BOUNDS.right));
+    y.set(clamp(nextY, BOUNDS.top, BOUNDS.bottom));
+  };
+
+  const handlePointerUp = (event: PointerEvent<HTMLElement>) => {
+    const velocityX = clampVelocity(dragState.current.velocityX);
+    const velocityY = clampVelocity(dragState.current.velocityY);
+    dragState.current.active = false;
+    event.currentTarget.releasePointerCapture(event.pointerId);
+
+    animate(x, clamp(x.get() + velocityX * 0.22, BOUNDS.left, BOUNDS.right), {
+      duration: 0.9,
+      ease: [0.16, 1, 0.3, 1],
+    });
+    animate(y, clamp(y.get() + velocityY * 0.22, BOUNDS.top, BOUNDS.bottom), {
+      duration: 0.9,
+      ease: [0.16, 1, 0.3, 1],
+    });
+  };
+
+  const handleWheel = (event: WheelEvent<HTMLElement>) => {
+    x.set(clamp(x.get() - event.deltaX - event.deltaY * 0.55, BOUNDS.left, BOUNDS.right));
+    y.set(clamp(y.get() - event.deltaY * 0.35, BOUNDS.top, BOUNDS.bottom));
+  };
+
+  const handleNavigate = (event: MouseEvent<HTMLAnchorElement>, item: ProjectCanvasItem) => {
+    const shouldUseNativeNavigation = event.metaKey || event.ctrlKey || event.shiftKey || event.altKey || event.button !== 0;
+
+    if (shouldUseNativeNavigation || window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      return;
+    }
+
+    event.preventDefault();
+
+    if (detailTransition) {
+      return;
+    }
+
+    const card = event.currentTarget.getBoundingClientRect();
+    const href = `/projects/v3/${item.projectId}`;
+    const transitionPayload = {
+      image: item.image,
+      projectId: item.projectId,
+      timestamp: Date.now(),
+      title: item.title,
+    };
+
+    setHoveredItem(null);
+    window.sessionStorage.setItem(DETAIL_TRANSITION_KEY, JSON.stringify(transitionPayload));
+    setDetailTransition({
+      href,
+      image: item.image,
+      projectId: item.projectId,
+      rect: {
+        height: card.height,
+        left: card.left,
+        top: card.top,
+        width: card.width,
+      },
+      title: item.title,
+    });
+
+    window.setTimeout(() => {
+      router.push(href);
+    }, DETAIL_TRANSITION_MS - 210);
+  };
+
+  return (
+    <main
+      className="relative h-screen overflow-hidden bg-[#e9e5dc] text-neutral-950 cursor-grab active:cursor-grabbing"
+      onPointerDown={handlePointerDown}
+      onPointerMove={handlePointerMove}
+      onPointerUp={handlePointerUp}
+      onPointerCancel={handlePointerUp}
+      onWheel={handleWheel}
+      onPointerLeave={() => setHoveredItem(null)}
+    >
+      <div className="absolute inset-0 bg-[linear-gradient(to_right,rgba(255,255,255,0.42)_1px,transparent_1px),linear-gradient(to_bottom,rgba(255,255,255,0.42)_1px,transparent_1px)] bg-[size:60px_60px]" />
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_0%,rgba(233,229,220,0.12)_45%,rgba(233,229,220,0.72)_100%)]" />
+
+      <motion.div
+        className="pointer-events-none absolute left-1/2 top-1/2 z-10 select-none"
+        style={{ x, y, width: CANVAS_WIDTH, height: CANVAS_HEIGHT }}
+        initial={{ opacity: 0, scale: 0.98 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ duration: 0.95, ease: [0.22, 1, 0.36, 1] }}
+      >
+        {backgroundProjects.map(({ index, item, position }) => (
+          <CanvasProjectCard
+            key={item.id}
+            canvasX={x}
+            canvasY={y}
+            index={index}
+            isDimmed={Boolean(hoveredItem && hoveredItem.projectId !== item.projectId)}
+            item={item}
+            position={position}
+            onNavigate={handleNavigate}
+            onHoverEnd={() => setHoveredItem(null)}
+            onHoverStart={() => setHoveredItem(item)}
+          />
+        ))}
+      </motion.div>
+
+      <div className="pointer-events-none fixed left-1/2 top-1/2 z-20 w-[min(78vw,1040px)] -translate-x-1/2 -translate-y-1/2 text-center">
+        <motion.div
+          initial={{ opacity: 0, scale: 0.96 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 1.1, ease: [0.22, 1, 0.36, 1] }}
+        >
+          <h1 className="text-[clamp(4.4rem,12vw,12rem)] font-medium leading-[0.86] tracking-[-0.065em] text-white drop-shadow-[0_1px_10px_rgba(0,0,0,0.05)]">
+            Atelier
+            <br />
+            SOW
+          </h1>
+          <p className="mt-8 text-xs uppercase tracking-[0.26em] text-white/80">Sound Of Wise</p>
+        </motion.div>
+      </div>
+
+      <motion.div
+        className="pointer-events-none absolute left-1/2 top-1/2 z-30 select-none"
+        style={{ x, y, width: CANVAS_WIDTH, height: CANVAS_HEIGHT }}
+        initial={{ opacity: 0, scale: 0.98 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ duration: 0.95, ease: [0.22, 1, 0.36, 1] }}
+      >
+        {foregroundProjects.map(({ index, item, position }) => (
+          <CanvasProjectCard
+            key={item.id}
+            canvasX={x}
+            canvasY={y}
+            index={index}
+            isDimmed={Boolean(hoveredItem && hoveredItem.projectId !== item.projectId)}
+            item={item}
+            position={position}
+            onNavigate={handleNavigate}
+            onHoverEnd={() => setHoveredItem(null)}
+            onHoverStart={() => setHoveredItem(item)}
+          />
+        ))}
+      </motion.div>
+
+      <motion.div
+        className="pointer-events-none fixed left-0 top-0 z-[70] rounded-[7px] bg-neutral-950 px-3 py-2 text-[11px] uppercase tracking-[0.16em] text-white shadow-[0_16px_40px_rgba(0,0,0,0.22)]"
+        style={{ x: cursorX, y: cursorY }}
+        initial={false}
+        animate={{ opacity: hoveredItem ? 1 : 0, scale: hoveredItem ? 1 : 0.96 }}
+        transition={{ duration: 0.18, ease: [0.22, 1, 0.36, 1] }}
+      >
+        {hoveredItem?.title}
+      </motion.div>
+
+      {detailTransition ? (
+        <motion.div
+          className="pointer-events-none fixed inset-0 z-[90] overflow-hidden bg-[#e9e5dc]"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.16, ease: [0.22, 1, 0.36, 1] }}
+        >
+          <motion.div
+            className="absolute inset-0 bg-[linear-gradient(to_right,rgba(255,255,255,0.34)_1px,transparent_1px),linear-gradient(to_bottom,rgba(255,255,255,0.34)_1px,transparent_1px)] bg-[size:60px_60px]"
+            initial={{ opacity: 1 }}
+            animate={{ opacity: 0 }}
+            transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
+          />
+          <motion.div
+            className="absolute overflow-hidden bg-neutral-200 shadow-[0_36px_110px_rgba(25,21,15,0.28)]"
+            initial={{
+              borderRadius: 0,
+              height: detailTransition.rect.height,
+              left: detailTransition.rect.left,
+              top: detailTransition.rect.top,
+              width: detailTransition.rect.width,
+            }}
+            animate={{
+              borderRadius: 0,
+              height: window.innerHeight + 48,
+              left: -24,
+              top: -24,
+              width: window.innerWidth + 48,
+            }}
+            transition={{ duration: DETAIL_TRANSITION_MS / 1000, ease: [0.76, 0, 0.24, 1] }}
+          >
+            <motion.div
+              className="absolute inset-0"
+              initial={{ scale: 1.08 }}
+              animate={{ scale: 1 }}
+              transition={{ duration: DETAIL_TRANSITION_MS / 1000, ease: [0.76, 0, 0.24, 1] }}
+            >
+              <Image
+                src={detailTransition.image}
+                alt={detailTransition.title}
+                fill
+                sizes="100vw"
+                className="object-cover"
+                priority
+                unoptimized={isSupabaseStorageUrl(detailTransition.image)}
+              />
+            </motion.div>
+            <motion.div
+              className="absolute inset-0 bg-black/28"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
+            />
+          </motion.div>
+          <motion.div
+            className="absolute inset-x-6 top-1/2 -translate-y-1/2 text-center text-white md:inset-x-10"
+            initial={{ opacity: 0, y: 24, filter: 'blur(10px)' }}
+            animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
+            transition={{ duration: 0.45, delay: 0.24, ease: [0.22, 1, 0.36, 1] }}
+          >
+            <p className="sow-kicker-on-image mb-5">Opening Project</p>
+            <p className="text-[clamp(3.4rem,8vw,8rem)] font-light leading-[0.9] tracking-[-0.06em]">{detailTransition.title}</p>
+          </motion.div>
+        </motion.div>
+      ) : null}
+
+      <div className="pointer-events-none fixed bottom-6 left-6 z-40 hidden text-[10px] uppercase tracking-[0.22em] text-neutral-500 md:block">
+        Drag to explore
+      </div>
+      <div className="pointer-events-none fixed bottom-6 right-6 z-40 text-[10px] uppercase tracking-[0.22em] text-neutral-500">
+        {canvasItems.length.toString().padStart(2, '0')} images
+      </div>
+    </main>
+  );
+}
+
+interface CanvasProjectCardProps {
+  canvasX: MotionValue<number>;
+  canvasY: MotionValue<number>;
+  index: number;
+  isDimmed: boolean;
+  onNavigate: (event: MouseEvent<HTMLAnchorElement>, item: ProjectCanvasItem) => void;
+  onHoverEnd: () => void;
+  onHoverStart: () => void;
+  position: ReturnType<typeof getCanvasProjectPosition>;
+  item: ProjectCanvasItem;
+}
+
+function CanvasProjectCard({ canvasX, canvasY, index, isDimmed, onHoverEnd, onHoverStart, onNavigate, position, item }: CanvasProjectCardProps) {
+  const imageX = useTransform(canvasX, (value) => {
+    const cardCenter = value + position.x + position.width / 2;
+    return clamp((cardCenter - 420) * -0.095, -112, 112);
+  });
+  const imageY = useTransform(canvasY, (value) => {
+    const cardCenter = value + position.y + position.height / 2;
+    return clamp((cardCenter - 430) * -0.085, -104, 104);
+  });
+
+  return (
+    <motion.article
+      className="pointer-events-auto absolute group"
+      style={{
+        left: position.x,
+        top: position.y,
+        width: position.width,
+        height: position.height,
+        zIndex: position.z,
+      }}
+      data-canvas-item-id={item.id}
+      initial={{ opacity: 0, y: 60, scale: 0.92 }}
+      animate={{ opacity: isDimmed ? 0.36 : 1, y: 0, scale: isDimmed ? 0.985 : 1, filter: isDimmed ? 'blur(6px)' : 'blur(0px)' }}
+      transition={{ duration: 0.32, delay: 0, ease: [0.22, 1, 0.36, 1] }}
+      whileHover={{ zIndex: 20, scale: 1.035 }}
+      onHoverStart={onHoverStart}
+      onHoverEnd={onHoverEnd}
+      onMouseEnter={onHoverStart}
+      onMouseLeave={onHoverEnd}
+      onPointerEnter={onHoverStart}
+      onPointerLeave={onHoverEnd}
+    >
+      <Link
+        href={`/projects/v3/${item.projectId}`}
+        className="relative block size-full cursor-none outline-none focus-visible:ring-1 focus-visible:ring-white"
+        onClick={(event) => onNavigate(event, item)}
+      >
+        <div className="relative size-full overflow-hidden bg-neutral-200 shadow-[0_24px_80px_rgba(31,27,20,0.16)]">
+          <motion.div
+            className="absolute -inset-[28%]"
+            style={{ x: imageX, y: imageY }}
+            whileHover={{ scale: 1.07 }}
+            transition={{ duration: 0.9, ease: [0.22, 1, 0.36, 1] }}
+          >
+            <Image
+              src={item.image}
+              alt={item.title}
+              fill
+              sizes="(max-width: 768px) 72vw, 560px"
+              priority={index < 4}
+              className="object-cover"
+              unoptimized={isSupabaseStorageUrl(item.image)}
+            />
+          </motion.div>
+          <div className="absolute inset-0 bg-black/0 transition-colors duration-500 group-hover:bg-black/10" />
+        </div>
+        <div className="absolute left-0 top-full mt-3 flex w-full items-start justify-between gap-5 text-[11px] uppercase tracking-[0.16em] text-neutral-600 opacity-0 transition-opacity duration-300 group-hover:opacity-100">
+          <div className="min-w-0">
+            <h2 className="truncate text-neutral-950">{item.title}</h2>
+            {item.subtitle ? <p className="mt-1 truncate normal-case tracking-normal text-neutral-500">{item.subtitle}</p> : null}
+          </div>
+          <span>{getProjectYear(item)}</span>
+        </div>
+      </Link>
+    </motion.article>
+  );
+}

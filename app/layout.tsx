@@ -2,8 +2,7 @@ import type { Metadata } from "next";
 import Script from "next/script";
 import "./globals.css";
 import localFont from "next/font/local";
-import Footer from "../components/Footer";
-import Navigation from "../components/Navigation";
+import SiteChrome from "../components/SiteChrome";
 import ThemeProvider from "../components/ThemeProvider";
 
 export const metadata: Metadata = {
@@ -91,9 +90,7 @@ gtag('config', 'G-DM6HR43M24');`}
         </head>
         <body className={`${pretendard.className} transition-colors`}>
         <ThemeProvider>
-            <Navigation/>
-            {children}
-            <Footer/>
+            <SiteChrome>{children}</SiteChrome>
         </ThemeProvider>
         </body>
         </html>
