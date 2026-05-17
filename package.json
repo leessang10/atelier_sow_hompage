@@ -5,12 +5,13 @@
   "scripts": {
     "dev": "next dev --turbopack",
     "build": "next build",
+    "postbuild": "mkdir -p .next/standalone/.next .next/standalone/public && cp -R .next/static .next/standalone/.next/ && cp -R public/. .next/standalone/public/",
     "start": "next start",
     "lint": "next lint",
     "test": "jest",
     "vercel:env:pull": "vercel env pull .env.development.local"
   },
-  "dependencies": {
+  "dependencies": {얼
     "@supabase/supabase-js": "^2.49.10",
     "@vercel/blob": "^0.27.0",
     "baseline-browser-mapping": "^2.9.14",

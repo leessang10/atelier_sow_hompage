@@ -6,9 +6,9 @@ import { useEffect, useRef, useState } from 'react';
 
 const heroSlides = [
   {
-    body: '정성의 태도를 공간에 심고, 생활의 장면이 오래 머물 수 있는 구조를 만듭니다.',
+    body: '정성을 다해 공간의 기준을 세우고, 생활의 장면이 오래 머물 수 있는 구조를 만듭니다.',
     image: '/images/누나매형.jpeg',
-    title: '심는 태도',
+    title: '정성의 기준',
   },
   {
     body: '건축, 인테리어, 가구와 빛의 결정을 하나의 목소리로 조율합니다.',
@@ -18,13 +18,13 @@ const heroSlides = [
   {
     body: '삶의 방식과 장소의 온도를 관찰하고, 필요한 만큼만 선명하게 남깁니다.',
     image: '/images/누나.jpeg',
-    title: '조용한 질서',
+    title: '차분한 균형',
   },
 ];
 
 const principles = [
   {
-    body: '공간의 표면보다 오래 남는 태도와 감각을 설계합니다. 일상의 장면 안에 조용한 질서와 따뜻한 긴장을 심습니다.',
+    body: '공간의 표면보다 오래 남는 태도와 감각을 설계합니다. 일상의 장면 안에 차분한 균형과 따뜻한 긴장을 만듭니다.',
     title: 'Sow Meaning',
   },
   {

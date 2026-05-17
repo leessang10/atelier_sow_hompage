@@ -8,7 +8,7 @@ import { MotionValue, animate, motion, useMotionValue, useTransform } from 'fram
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { MouseEvent, PointerEvent, WheelEvent, useMemo, useRef, useState } from 'react';
+import { MouseEvent, PointerEvent, WheelEvent, useEffect, useMemo, useRef, useState } from 'react';
 
 interface HomeArchiveProps {
   projects: SupabaseProject[];
@@ -24,6 +24,8 @@ const BOUNDS = {
 };
 const DETAIL_TRANSITION_MS = 980;
 const DETAIL_TRANSITION_KEY = 'atelier-sow-project-transition';
+const SAFE_VIEWPORT_MARGIN = 18;
+const CARD_HOVER_SCALE = 1.035;
 
 interface DetailTransitionState {
   href: string;
@@ -58,6 +60,7 @@ export function HomeArchive({ projects }: HomeArchiveProps) {
   const cursorY = useMotionValue(0);
   const [hoveredItem, setHoveredItem] = useState<ProjectCanvasItem | null>(null);
   const [detailTransition, setDetailTransition] = useState<DetailTransitionState | null>(null);
+  const [viewport, setViewport] = useState({ height: 0, width: 0 });
   const dragState = useRef({
     active: false,
     baseX: 0,
@@ -84,6 +87,20 @@ export function HomeArchive({ projects }: HomeArchiveProps) {
   );
   const backgroundProjects = canvasProjects.filter((project) => project.layer === 'background');
   const foregroundProjects = canvasProjects.filter((project) => project.layer === 'foreground');
+
+  useEffect(() => {
+    const updateViewport = () => {
+      setViewport({
+        height: window.innerHeight,
+        width: window.innerWidth,
+      });
+    };
+
+    updateViewport();
+    window.addEventListener('resize', updateViewport);
+
+    return () => window.removeEventListener('resize', updateViewport);
+  }, []);
 
   if (!canvasItems.length) {
     return (
@@ -229,6 +246,7 @@ export function HomeArchive({ projects }: HomeArchiveProps) {
             isDimmed={Boolean(hoveredItem && hoveredItem.projectId !== item.projectId)}
             item={item}
             position={position}
+            viewport={viewport}
             onNavigate={handleNavigate}
             onHoverEnd={() => setHoveredItem(null)}
             onHoverStart={() => setHoveredItem(item)}
@@ -267,6 +285,7 @@ export function HomeArchive({ projects }: HomeArchiveProps) {
             isDimmed={Boolean(hoveredItem && hoveredItem.projectId !== item.projectId)}
             item={item}
             position={position}
+            viewport={viewport}
             onNavigate={handleNavigate}
             onHoverEnd={() => setHoveredItem(null)}
             onHoverStart={() => setHoveredItem(item)}
@@ -370,16 +389,58 @@ interface CanvasProjectCardProps {
   onHoverStart: () => void;
   position: ReturnType<typeof getCanvasProjectPosition>;
   item: ProjectCanvasItem;
+  viewport: {
+    height: number;
+    width: number;
+  };
 }
 
-function CanvasProjectCard({ canvasX, canvasY, index, isDimmed, onHoverEnd, onHoverStart, onNavigate, position, item }: CanvasProjectCardProps) {
+function CanvasProjectCard({ canvasX, canvasY, index, isDimmed, onHoverEnd, onHoverStart, onNavigate, position, item, viewport }: CanvasProjectCardProps) {
   const imageX = useTransform(canvasX, (value) => {
     const cardCenter = value + position.x + position.width / 2;
-    return clamp((cardCenter - 420) * -0.095, -112, 112);
+    return clamp((cardCenter - 420) * -0.16, -190, 190);
   });
   const imageY = useTransform(canvasY, (value) => {
     const cardCenter = value + position.y + position.height / 2;
-    return clamp((cardCenter - 430) * -0.085, -104, 104);
+    return clamp((cardCenter - 430) * -0.145, -170, 170);
+  });
+  const edgeCorrectionX = useTransform(canvasX, (value) => {
+    if (!viewport.width || viewport.width < 1024) {
+      return 0;
+    }
+
+    const hoverOverflow = (position.width * (CARD_HOVER_SCALE - 1)) / 2;
+    const screenLeft = viewport.width / 2 + value + position.x - hoverOverflow;
+    const screenRight = screenLeft + position.width + hoverOverflow * 2;
+
+    if (screenLeft < SAFE_VIEWPORT_MARGIN) {
+      return SAFE_VIEWPORT_MARGIN - screenLeft;
+    }
+
+    if (screenRight > viewport.width - SAFE_VIEWPORT_MARGIN) {
+      return viewport.width - SAFE_VIEWPORT_MARGIN - screenRight;
+    }
+
+    return 0;
+  });
+  const edgeCorrectionY = useTransform(canvasY, (value) => {
+    if (!viewport.height || viewport.width < 1024) {
+      return 0;
+    }
+
+    const hoverOverflow = (position.height * (CARD_HOVER_SCALE - 1)) / 2;
+    const screenTop = viewport.height / 2 + value + position.y - hoverOverflow;
+    const screenBottom = screenTop + position.height + hoverOverflow * 2;
+
+    if (screenTop < SAFE_VIEWPORT_MARGIN) {
+      return SAFE_VIEWPORT_MARGIN - screenTop;
+    }
+
+    if (screenBottom > viewport.height - SAFE_VIEWPORT_MARGIN) {
+      return viewport.height - SAFE_VIEWPORT_MARGIN - screenBottom;
+    }
+
+    return 0;
   });
 
   return (
@@ -389,14 +450,20 @@ function CanvasProjectCard({ canvasX, canvasY, index, isDimmed, onHoverEnd, onHo
         left: position.x,
         top: position.y,
         width: position.width,
-        height: position.height,
+        height: position.height + 58,
         zIndex: position.z,
+        x: edgeCorrectionX,
+        y: edgeCorrectionY,
       }}
       data-canvas-item-id={item.id}
-      initial={{ opacity: 0, y: 60, scale: 0.92 }}
-      animate={{ opacity: isDimmed ? 0.36 : 1, y: 0, scale: isDimmed ? 0.985 : 1, filter: isDimmed ? 'blur(6px)' : 'blur(0px)' }}
+      initial={{ opacity: 0, scale: 0.92 }}
+      animate={{
+        opacity: isDimmed ? 0.36 : 1,
+        scale: isDimmed ? 0.985 : 1,
+        filter: isDimmed ? 'blur(6px)' : 'blur(0px)',
+      }}
       transition={{ duration: 0.32, delay: 0, ease: [0.22, 1, 0.36, 1] }}
-      whileHover={{ zIndex: 20, scale: 1.035 }}
+      whileHover={{ zIndex: 20, scale: CARD_HOVER_SCALE }}
       onHoverStart={onHoverStart}
       onHoverEnd={onHoverEnd}
       onMouseEnter={onHoverStart}
@@ -406,15 +473,15 @@ function CanvasProjectCard({ canvasX, canvasY, index, isDimmed, onHoverEnd, onHo
     >
       <Link
         href={`/projects/v3/${item.projectId}`}
-        className="relative block size-full cursor-none outline-none focus-visible:ring-1 focus-visible:ring-white"
+        className="relative block h-full w-full cursor-none bg-transparent outline-none focus-visible:ring-1 focus-visible:ring-white"
         onClick={(event) => onNavigate(event, item)}
       >
-        <div className="relative size-full overflow-hidden bg-neutral-200 shadow-[0_24px_80px_rgba(31,27,20,0.16)]">
+        <div className="relative overflow-hidden bg-neutral-200 shadow-[0_24px_80px_rgba(31,27,20,0.16)]" style={{ height: position.height }}>
           <motion.div
-            className="absolute -inset-[28%]"
+            className="absolute -inset-[72%]"
             style={{ x: imageX, y: imageY }}
-            whileHover={{ scale: 1.07 }}
-            transition={{ duration: 0.9, ease: [0.22, 1, 0.36, 1] }}
+            whileHover={{ scale: 1.13 }}
+            transition={{ duration: 1.05, ease: [0.22, 1, 0.36, 1] }}
           >
             <Image
               src={item.image}
@@ -428,7 +495,7 @@ function CanvasProjectCard({ canvasX, canvasY, index, isDimmed, onHoverEnd, onHo
           </motion.div>
           <div className="absolute inset-0 bg-black/0 transition-colors duration-500 group-hover:bg-black/10" />
         </div>
-        <div className="absolute left-0 top-full mt-3 flex w-full items-start justify-between gap-5 text-[11px] uppercase tracking-[0.16em] text-neutral-600 opacity-0 transition-opacity duration-300 group-hover:opacity-100">
+        <div className="flex w-full items-start justify-between gap-5 pt-3 text-[11px] uppercase tracking-[0.16em] text-neutral-600 opacity-0 transition-opacity duration-300 group-hover:opacity-100">
           <div className="min-w-0">
             <h2 className="truncate text-neutral-950">{item.title}</h2>
             {item.subtitle ? <p className="mt-1 truncate normal-case tracking-normal text-neutral-500">{item.subtitle}</p> : null}
