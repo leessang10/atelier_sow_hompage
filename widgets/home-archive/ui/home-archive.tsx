@@ -8,7 +8,7 @@ import { MotionValue, animate, motion, useMotionValue, useTransform } from 'fram
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { MouseEvent, PointerEvent, WheelEvent, useMemo, useRef, useState } from 'react';
+import { MouseEvent, PointerEvent, WheelEvent, useEffect, useMemo, useRef, useState } from 'react';
 
 interface HomeArchiveProps {
   projects: SupabaseProject[];
@@ -85,6 +85,41 @@ export function HomeArchive({ projects }: HomeArchiveProps) {
   );
   const backgroundProjects = canvasProjects.filter((project) => project.layer === 'background');
   const foregroundProjects = canvasProjects.filter((project) => project.layer === 'foreground');
+
+  useEffect(() => {
+    const html = document.documentElement;
+    const body = document.body;
+    const previousHtmlOverflow = html.style.overflow;
+    const previousHtmlOverscroll = html.style.overscrollBehavior;
+    const previousHtmlTouchAction = html.style.touchAction;
+    const previousBodyOverflow = body.style.overflow;
+    const previousBodyOverscroll = body.style.overscrollBehavior;
+    const previousBodyTouchAction = body.style.touchAction;
+
+    const preventPagePull = (event: TouchEvent) => {
+      if (event.cancelable) {
+        event.preventDefault();
+      }
+    };
+
+    html.style.overflow = 'hidden';
+    html.style.overscrollBehavior = 'none';
+    html.style.touchAction = 'none';
+    body.style.overflow = 'hidden';
+    body.style.overscrollBehavior = 'none';
+    body.style.touchAction = 'none';
+    document.addEventListener('touchmove', preventPagePull, { passive: false });
+
+    return () => {
+      html.style.overflow = previousHtmlOverflow;
+      html.style.overscrollBehavior = previousHtmlOverscroll;
+      html.style.touchAction = previousHtmlTouchAction;
+      body.style.overflow = previousBodyOverflow;
+      body.style.overscrollBehavior = previousBodyOverscroll;
+      body.style.touchAction = previousBodyTouchAction;
+      document.removeEventListener('touchmove', preventPagePull);
+    };
+  }, []);
 
   if (!canvasItems.length) {
     return (
@@ -203,7 +238,7 @@ export function HomeArchive({ projects }: HomeArchiveProps) {
 
   return (
     <main
-      className="relative h-screen overflow-hidden bg-[#e9e5dc] text-neutral-950 cursor-grab active:cursor-grabbing"
+      className="relative h-screen touch-none overflow-hidden overscroll-none bg-[#e9e5dc] text-neutral-950 cursor-grab active:cursor-grabbing"
       onPointerDown={handlePointerDown}
       onPointerMove={handlePointerMove}
       onPointerUp={handlePointerUp}
