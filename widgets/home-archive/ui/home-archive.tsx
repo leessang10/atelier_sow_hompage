@@ -8,7 +8,7 @@ import { MotionValue, animate, motion, useMotionValue, useTransform } from 'fram
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { MouseEvent, PointerEvent, WheelEvent, useEffect, useMemo, useRef, useState } from 'react';
+import { MouseEvent, PointerEvent, WheelEvent, useMemo, useRef, useState } from 'react';
 
 interface HomeArchiveProps {
   projects: SupabaseProject[];
@@ -24,7 +24,6 @@ const BOUNDS = {
 };
 const DETAIL_TRANSITION_MS = 980;
 const DETAIL_TRANSITION_KEY = 'atelier-sow-project-transition';
-const SAFE_VIEWPORT_MARGIN = 18;
 const CARD_HOVER_SCALE = 1.035;
 
 interface DetailTransitionState {
@@ -60,7 +59,6 @@ export function HomeArchive({ projects }: HomeArchiveProps) {
   const cursorY = useMotionValue(0);
   const [hoveredItem, setHoveredItem] = useState<ProjectCanvasItem | null>(null);
   const [detailTransition, setDetailTransition] = useState<DetailTransitionState | null>(null);
-  const [viewport, setViewport] = useState({ height: 0, width: 0 });
   const dragState = useRef({
     active: false,
     baseX: 0,
@@ -87,20 +85,6 @@ export function HomeArchive({ projects }: HomeArchiveProps) {
   );
   const backgroundProjects = canvasProjects.filter((project) => project.layer === 'background');
   const foregroundProjects = canvasProjects.filter((project) => project.layer === 'foreground');
-
-  useEffect(() => {
-    const updateViewport = () => {
-      setViewport({
-        height: window.innerHeight,
-        width: window.innerWidth,
-      });
-    };
-
-    updateViewport();
-    window.addEventListener('resize', updateViewport);
-
-    return () => window.removeEventListener('resize', updateViewport);
-  }, []);
 
   if (!canvasItems.length) {
     return (
@@ -246,7 +230,6 @@ export function HomeArchive({ projects }: HomeArchiveProps) {
             isDimmed={Boolean(hoveredItem && hoveredItem.projectId !== item.projectId)}
             item={item}
             position={position}
-            viewport={viewport}
             onNavigate={handleNavigate}
             onHoverEnd={() => setHoveredItem(null)}
             onHoverStart={() => setHoveredItem(item)}
@@ -285,7 +268,6 @@ export function HomeArchive({ projects }: HomeArchiveProps) {
             isDimmed={Boolean(hoveredItem && hoveredItem.projectId !== item.projectId)}
             item={item}
             position={position}
-            viewport={viewport}
             onNavigate={handleNavigate}
             onHoverEnd={() => setHoveredItem(null)}
             onHoverStart={() => setHoveredItem(item)}
@@ -389,13 +371,9 @@ interface CanvasProjectCardProps {
   onHoverStart: () => void;
   position: ReturnType<typeof getCanvasProjectPosition>;
   item: ProjectCanvasItem;
-  viewport: {
-    height: number;
-    width: number;
-  };
 }
 
-function CanvasProjectCard({ canvasX, canvasY, index, isDimmed, onHoverEnd, onHoverStart, onNavigate, position, item, viewport }: CanvasProjectCardProps) {
+function CanvasProjectCard({ canvasX, canvasY, index, isDimmed, onHoverEnd, onHoverStart, onNavigate, position, item }: CanvasProjectCardProps) {
   const imageX = useTransform(canvasX, (value) => {
     const cardCenter = value + position.x + position.width / 2;
     return clamp((cardCenter - 420) * -0.16, -190, 190);
@@ -403,44 +381,6 @@ function CanvasProjectCard({ canvasX, canvasY, index, isDimmed, onHoverEnd, onHo
   const imageY = useTransform(canvasY, (value) => {
     const cardCenter = value + position.y + position.height / 2;
     return clamp((cardCenter - 430) * -0.145, -170, 170);
-  });
-  const edgeCorrectionX = useTransform(canvasX, (value) => {
-    if (!viewport.width || viewport.width < 1024) {
-      return 0;
-    }
-
-    const hoverOverflow = (position.width * (CARD_HOVER_SCALE - 1)) / 2;
-    const screenLeft = viewport.width / 2 + value + position.x - hoverOverflow;
-    const screenRight = screenLeft + position.width + hoverOverflow * 2;
-
-    if (screenLeft < SAFE_VIEWPORT_MARGIN) {
-      return SAFE_VIEWPORT_MARGIN - screenLeft;
-    }
-
-    if (screenRight > viewport.width - SAFE_VIEWPORT_MARGIN) {
-      return viewport.width - SAFE_VIEWPORT_MARGIN - screenRight;
-    }
-
-    return 0;
-  });
-  const edgeCorrectionY = useTransform(canvasY, (value) => {
-    if (!viewport.height || viewport.width < 1024) {
-      return 0;
-    }
-
-    const hoverOverflow = (position.height * (CARD_HOVER_SCALE - 1)) / 2;
-    const screenTop = viewport.height / 2 + value + position.y - hoverOverflow;
-    const screenBottom = screenTop + position.height + hoverOverflow * 2;
-
-    if (screenTop < SAFE_VIEWPORT_MARGIN) {
-      return SAFE_VIEWPORT_MARGIN - screenTop;
-    }
-
-    if (screenBottom > viewport.height - SAFE_VIEWPORT_MARGIN) {
-      return viewport.height - SAFE_VIEWPORT_MARGIN - screenBottom;
-    }
-
-    return 0;
   });
 
   return (
@@ -452,8 +392,6 @@ function CanvasProjectCard({ canvasX, canvasY, index, isDimmed, onHoverEnd, onHo
         width: position.width,
         height: position.height + 58,
         zIndex: position.z,
-        x: edgeCorrectionX,
-        y: edgeCorrectionY,
       }}
       data-canvas-item-id={item.id}
       initial={{ opacity: 0, scale: 0.92 }}
