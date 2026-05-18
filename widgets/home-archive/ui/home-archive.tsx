@@ -20,7 +20,7 @@ const BOUNDS = {
   left: -3100,
   right: 240,
   top: -2240,
-  bottom: 260,
+  bottom: 260,결
 };
 const DETAIL_TRANSITION_MS = 980;
 const DETAIL_TRANSITION_KEY = 'atelier-sow-project-transition';
@@ -44,7 +44,7 @@ function clamp(value: number, min: number, max: number) {
 }
 
 function clampVelocity(value: number) {
-  return clamp(value, -900, 900);
+  return clamp(value, -1500, 1500);
 }
 
 function getCanvasLayer(index: number) {
@@ -179,13 +179,13 @@ export function HomeArchive({ projects }: HomeArchiveProps) {
     dragState.current.active = false;
     event.currentTarget.releasePointerCapture(event.pointerId);
 
-    animate(x, clamp(x.get() + velocityX * 0.22, BOUNDS.left, BOUNDS.right), {
-      duration: 0.9,
-      ease: [0.16, 1, 0.3, 1],
+    animate(x, clamp(x.get() + velocityX * 0.52, BOUNDS.left, BOUNDS.right), {
+      duration: 1.65,
+      ease: [0.12, 0.98, 0.22, 1],
     });
-    animate(y, clamp(y.get() + velocityY * 0.22, BOUNDS.top, BOUNDS.bottom), {
-      duration: 0.9,
-      ease: [0.16, 1, 0.3, 1],
+    animate(y, clamp(y.get() + velocityY * 0.52, BOUNDS.top, BOUNDS.bottom), {
+      duration: 1.65,
+      ease: [0.12, 0.98, 0.22, 1],
     });
   };
 
