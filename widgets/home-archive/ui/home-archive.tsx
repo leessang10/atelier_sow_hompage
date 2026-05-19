@@ -4,11 +4,21 @@ import { getCanvasProjectPosition, getProjectYear } from '@/entities/project/lib
 import { ProjectCanvasItem, buildProjectCanvasItems } from '@/entities/project/lib/project-canvas-items';
 import { isSupabaseStorageUrl } from '@/lib/image';
 import { SupabaseProject } from '@/types/project.types';
-import { MotionValue, animate, motion, useMotionValue, useTransform } from 'framer-motion';
+import {
+  CANVAS_DRAG_BOUNDS,
+  clampCanvasX,
+  clampCanvasY,
+  getCanvasDragTransition,
+  getCanvasInitialPosition,
+  getDimmedCanvasItemStyle,
+  getWheelPanDelta,
+  shouldPreventCanvasContextMenu,
+} from '@/widgets/home-archive/lib/canvas-motion';
+import { MotionValue, motion, useDragControls, useMotionValue, useTransform } from 'framer-motion';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { MouseEvent, PointerEvent, WheelEvent, useEffect, useMemo, useRef, useState } from 'react';
+import { MouseEvent, PointerEvent, WheelEvent, useEffect, useMemo, useState } from 'react';
 
 interface HomeArchiveProps {
   projects: SupabaseProject[];
@@ -16,12 +26,6 @@ interface HomeArchiveProps {
 
 const CANVAS_WIDTH = 4200;
 const CANVAS_HEIGHT = 3000;
-const BOUNDS = {
-  left: -3100,
-  right: 240,
-  top: -2240,
-  bottom: 260,결
-};
 const DETAIL_TRANSITION_MS = 980;
 const DETAIL_TRANSITION_KEY = 'atelier-sow-project-transition';
 const CARD_HOVER_SCALE = 1.035;
@@ -43,34 +47,20 @@ function clamp(value: number, min: number, max: number) {
   return Math.min(Math.max(value, min), max);
 }
 
-function clampVelocity(value: number) {
-  return clamp(value, -1500, 1500);
-}
-
 function getCanvasLayer(index: number) {
   return index % 5 === 0 || index % 5 === 2 ? 'foreground' : 'background';
 }
 
 export function HomeArchive({ projects }: HomeArchiveProps) {
   const router = useRouter();
-  const x = useMotionValue(-1460);
-  const y = useMotionValue(-1060);
+  const initialPosition = getCanvasInitialPosition();
+  const x = useMotionValue(initialPosition.x);
+  const y = useMotionValue(initialPosition.y);
+  const dragControls = useDragControls();
   const cursorX = useMotionValue(0);
   const cursorY = useMotionValue(0);
   const [hoveredItem, setHoveredItem] = useState<ProjectCanvasItem | null>(null);
   const [detailTransition, setDetailTransition] = useState<DetailTransitionState | null>(null);
-  const dragState = useRef({
-    active: false,
-    baseX: 0,
-    baseY: 0,
-    lastTime: 0,
-    lastX: 0,
-    lastY: 0,
-    startX: 0,
-    startY: 0,
-    velocityX: 0,
-    velocityY: 0,
-  });
 
   const canvasItems = useMemo(() => buildProjectCanvasItems(projects), [projects]);
   const canvasProjects = useMemo(
@@ -85,6 +75,7 @@ export function HomeArchive({ projects }: HomeArchiveProps) {
   );
   const backgroundProjects = canvasProjects.filter((project) => project.layer === 'background');
   const foregroundProjects = canvasProjects.filter((project) => project.layer === 'foreground');
+  const canvasDragTransition = useMemo(() => getCanvasDragTransition(), []);
 
   useEffect(() => {
     const html = document.documentElement;
@@ -130,19 +121,7 @@ export function HomeArchive({ projects }: HomeArchiveProps) {
   }
 
   const handlePointerDown = (event: PointerEvent<HTMLElement>) => {
-    dragState.current = {
-      active: true,
-      baseX: x.get(),
-      baseY: y.get(),
-      lastTime: performance.now(),
-      lastX: event.clientX,
-      lastY: event.clientY,
-      startX: event.clientX,
-      startY: event.clientY,
-      velocityX: 0,
-      velocityY: 0,
-    };
-    event.currentTarget.setPointerCapture(event.pointerId);
+    dragControls.start(event, { snapToCursor: false });
   };
 
   const handlePointerMove = (event: PointerEvent<HTMLElement>) => {
@@ -153,45 +132,19 @@ export function HomeArchive({ projects }: HomeArchiveProps) {
     const hoveredId = hoveredCard?.dataset.canvasItemId ?? null;
     const nextHoveredItem = hoveredId ? canvasItems.find((item) => item.id === hoveredId) ?? null : null;
     setHoveredItem(nextHoveredItem);
-
-    if (!dragState.current.active) {
-      return;
-    }
-
-    const nextX = dragState.current.baseX + event.clientX - dragState.current.startX;
-    const nextY = dragState.current.baseY + event.clientY - dragState.current.startY;
-    const now = performance.now();
-    const elapsed = Math.max(now - dragState.current.lastTime, 16);
-
-    dragState.current.velocityX = ((event.clientX - dragState.current.lastX) / elapsed) * 1000;
-    dragState.current.velocityY = ((event.clientY - dragState.current.lastY) / elapsed) * 1000;
-    dragState.current.lastX = event.clientX;
-    dragState.current.lastY = event.clientY;
-    dragState.current.lastTime = now;
-
-    x.set(clamp(nextX, BOUNDS.left, BOUNDS.right));
-    y.set(clamp(nextY, BOUNDS.top, BOUNDS.bottom));
-  };
-
-  const handlePointerUp = (event: PointerEvent<HTMLElement>) => {
-    const velocityX = clampVelocity(dragState.current.velocityX);
-    const velocityY = clampVelocity(dragState.current.velocityY);
-    dragState.current.active = false;
-    event.currentTarget.releasePointerCapture(event.pointerId);
-
-    animate(x, clamp(x.get() + velocityX * 0.52, BOUNDS.left, BOUNDS.right), {
-      duration: 1.65,
-      ease: [0.12, 0.98, 0.22, 1],
-    });
-    animate(y, clamp(y.get() + velocityY * 0.52, BOUNDS.top, BOUNDS.bottom), {
-      duration: 1.65,
-      ease: [0.12, 0.98, 0.22, 1],
-    });
   };
 
   const handleWheel = (event: WheelEvent<HTMLElement>) => {
-    x.set(clamp(x.get() - event.deltaX - event.deltaY * 0.55, BOUNDS.left, BOUNDS.right));
-    y.set(clamp(y.get() - event.deltaY * 0.35, BOUNDS.top, BOUNDS.bottom));
+    const panDelta = getWheelPanDelta(event);
+
+    x.set(clampCanvasX(x.get() + panDelta.x));
+    y.set(clampCanvasY(y.get() + panDelta.y));
+  };
+
+  const handleContextMenu = (event: MouseEvent<HTMLElement>) => {
+    if (shouldPreventCanvasContextMenu()) {
+      event.preventDefault();
+    }
   };
 
   const handleNavigate = (event: MouseEvent<HTMLAnchorElement>, item: ProjectCanvasItem) => {
@@ -241,13 +194,24 @@ export function HomeArchive({ projects }: HomeArchiveProps) {
       className="relative h-screen touch-none overflow-hidden overscroll-none bg-[#e9e5dc] text-neutral-950 cursor-grab active:cursor-grabbing"
       onPointerDown={handlePointerDown}
       onPointerMove={handlePointerMove}
-      onPointerUp={handlePointerUp}
-      onPointerCancel={handlePointerUp}
       onWheel={handleWheel}
+      onContextMenu={handleContextMenu}
       onPointerLeave={() => setHoveredItem(null)}
     >
       <div className="absolute inset-0 bg-[linear-gradient(to_right,rgba(255,255,255,0.42)_1px,transparent_1px),linear-gradient(to_bottom,rgba(255,255,255,0.42)_1px,transparent_1px)] bg-[size:60px_60px]" />
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_0%,rgba(233,229,220,0.12)_45%,rgba(233,229,220,0.72)_100%)]" />
+
+      <motion.div
+        aria-hidden="true"
+        className="pointer-events-none absolute left-1/2 top-1/2 select-none"
+        style={{ x, y, width: CANVAS_WIDTH, height: CANVAS_HEIGHT }}
+        drag
+        dragControls={dragControls}
+        dragConstraints={CANVAS_DRAG_BOUNDS}
+        dragListener={false}
+        dragTransition={canvasDragTransition}
+        dragElastic={0}
+      />
 
       <motion.div
         className="pointer-events-none absolute left-1/2 top-1/2 z-10 select-none"
@@ -430,11 +394,7 @@ function CanvasProjectCard({ canvasX, canvasY, index, isDimmed, onHoverEnd, onHo
       }}
       data-canvas-item-id={item.id}
       initial={{ opacity: 0, scale: 0.92 }}
-      animate={{
-        opacity: isDimmed ? 0.36 : 1,
-        scale: isDimmed ? 0.985 : 1,
-        filter: isDimmed ? 'blur(6px)' : 'blur(0px)',
-      }}
+      animate={getDimmedCanvasItemStyle(isDimmed)}
       transition={{ duration: 0.32, delay: 0, ease: [0.22, 1, 0.36, 1] }}
       whileHover={{ zIndex: 20, scale: CARD_HOVER_SCALE }}
       onHoverStart={onHoverStart}

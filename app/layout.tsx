@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Script from "next/script";
 import "./globals.css";
 import localFont from "next/font/local";
+import LenisProvider from "../components/LenisProvider";
 import SiteChrome from "../components/SiteChrome";
 import ThemeProvider from "../components/ThemeProvider";
 
@@ -90,7 +91,9 @@ gtag('config', 'G-DM6HR43M24');`}
         </head>
         <body className={`${pretendard.className} transition-colors`}>
         <ThemeProvider>
-            <SiteChrome>{children}</SiteChrome>
+            <LenisProvider>
+                <SiteChrome>{children}</SiteChrome>
+            </LenisProvider>
         </ThemeProvider>
         </body>
         </html>

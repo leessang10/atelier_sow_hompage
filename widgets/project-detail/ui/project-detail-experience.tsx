@@ -2,9 +2,10 @@
 
 import { isSupabaseStorageUrl } from '@/lib/image';
 import { SupabaseProject, TiptapNode } from '@/types/project.types';
+import { getGalleryParallaxRange } from '@/widgets/project-detail/lib/gallery-parallax';
 import { motion, useScroll, useTransform } from 'framer-motion';
 import Image from 'next/image';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 interface ProjectDetailExperienceProps {
   project: SupabaseProject;
@@ -21,6 +22,14 @@ interface BodySection {
   level: number;
   text: string;
   type: 'heading' | 'paragraph';
+}
+
+interface ParallaxGalleryImageProps {
+  alt: string;
+  className: string;
+  isWide: boolean;
+  sizes: string;
+  src: string;
 }
 
 function collectText(node: TiptapNode): string {
@@ -82,6 +91,40 @@ function getProjectYear(createdAt: string) {
 }
 
 const DETAIL_TRANSITION_KEY = 'atelier-sow-project-transition';
+
+function ParallaxGalleryImage({ alt, className, isWide, sizes, src }: ParallaxGalleryImageProps) {
+  const figureRef = useRef<HTMLElement | null>(null);
+  const { scrollYProgress } = useScroll({
+    target: figureRef,
+    offset: ['start end', 'end start'],
+  });
+  const imageY = useTransform(scrollYProgress, [0, 1], getGalleryParallaxRange({ isWide }));
+
+  return (
+    <motion.figure
+      ref={figureRef}
+      className={`relative overflow-hidden bg-neutral-200 shadow-[0_28px_90px_rgba(35,30,22,0.14)] ${className}`}
+      initial={{ opacity: 0, y: 70, scale: 0.96 }}
+      whileInView={{ opacity: 1, y: 0, scale: 1 }}
+      viewport={{ once: true, margin: '-8% 0px' }}
+      transition={{ duration: 0.85, ease: [0.22, 1, 0.36, 1] }}
+    >
+      <motion.div
+        className="absolute -inset-[15%]"
+        style={{ y: imageY }}
+      >
+        <Image
+          src={src}
+          alt={alt}
+          fill
+          sizes={sizes}
+          className="object-cover"
+          unoptimized={isSupabaseStorageUrl(src)}
+        />
+      </motion.div>
+    </motion.figure>
+  );
+}
 
 export function ProjectDetailExperience({ project }: ProjectDetailExperienceProps) {
   const [incomingTransition, setIncomingTransition] = useState<IncomingTransition | null>(null);
@@ -225,25 +268,14 @@ export function ProjectDetailExperience({ project }: ProjectDetailExperienceProp
                 : 'md:col-span-6 aspect-[4/5]';
 
             return (
-              <motion.figure
+              <ParallaxGalleryImage
                 key={src}
-                className={`relative overflow-hidden bg-neutral-200 shadow-[0_28px_90px_rgba(35,30,22,0.14)] ${className}`}
-                initial={{ opacity: 0, y: 70, scale: 0.96 }}
-                whileInView={{ opacity: 1, y: 0, scale: 1 }}
-                viewport={{ once: true, margin: '-8% 0px' }}
-                transition={{ duration: 0.85, ease: [0.22, 1, 0.36, 1] }}
-              >
-                <motion.div className="absolute -inset-[10%]" whileInView={{ y: ['-4%', '4%'] }} transition={{ duration: 1.2, ease: [0.22, 1, 0.36, 1] }}>
-                  <Image
-                    src={src}
-                    alt={`${project.title} ${index + 1}`}
-                    fill
-                    sizes={isWide ? '100vw' : '(max-width: 768px) 100vw, 50vw'}
-                    className="object-cover"
-                    unoptimized={isSupabaseStorageUrl(src)}
-                  />
-                </motion.div>
-              </motion.figure>
+                alt={`${project.title} ${index + 1}`}
+                className={className}
+                isWide={isWide}
+                sizes={isWide ? '100vw' : '(max-width: 768px) 100vw, 50vw'}
+                src={src}
+              />
             );
           })}
         </div>
