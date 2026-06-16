@@ -20,7 +20,7 @@ const BOUNDS = {
   left: -3100,
   right: 240,
   top: -2240,
-  bottom: 260,결
+  bottom: 260,
 };
 const DETAIL_TRANSITION_MS = 980;
 const DETAIL_TRANSITION_KEY = 'atelier-sow-project-transition';

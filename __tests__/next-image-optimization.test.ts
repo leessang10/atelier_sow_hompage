@@ -50,7 +50,7 @@ describe('next image optimization configuration', () => {
   });
 
   it('adds explicit sizes to the project detail hero image', () => {
-    const file = fs.readFileSync(path.join(process.cwd(), 'app/projects/v3/[id]/page.tsx'), 'utf8');
+    const file = fs.readFileSync(path.join(process.cwd(), 'widgets/project-detail/ui/project-detail-experience.tsx'), 'utf8');
 
     expect(file).toContain('sizes="100vw"');
   });
