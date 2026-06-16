@@ -3,21 +3,20 @@
 import { motion, useScroll, useTransform } from 'framer-motion';
 import Image from 'next/image';
 import { useEffect, useRef, useState } from 'react';
+import { getAboutHeroImageCandidates, pickRandomAboutHeroImage } from './about-hero';
+import { isSupabaseStorageUrl } from '@/lib/image';
 
 const heroSlides = [
   {
     body: '정성을 다해 공간의 기준을 세우고, 생활의 장면이 오래 머물 수 있는 구조를 만듭니다.',
-    image: '/images/누나매형.jpeg',
     title: '정성의 기준',
   },
   {
     body: '건축, 인테리어, 가구와 빛의 결정을 하나의 목소리로 조율합니다.',
-    image: '/images/매형.jpeg',
     title: '지혜의 소리',
   },
   {
     body: '삶의 방식과 장소의 온도를 관찰하고, 필요한 만큼만 선명하게 남깁니다.',
-    image: '/images/누나.jpeg',
     title: '차분한 균형',
   },
 ];
@@ -51,7 +50,12 @@ const architects = [
 ];
 
 export default function About() {
-  const [activeSlide, setActiveSlide] = useState(0);
+  const heroImageCandidates = useRef(getAboutHeroImageCandidates());
+  const [heroState, setHeroState] = useState(() => ({
+    activeSlide: 0,
+    slideImages: heroSlides.map((_, index) => heroImageCandidates.current[index % heroImageCandidates.current.length]),
+  }));
+  const { activeSlide, slideImages } = heroState;
   const galleryRef = useRef<HTMLElement | null>(null);
   const { scrollYProgress } = useScroll();
   const { scrollYProgress: galleryProgress } = useScroll({
@@ -66,7 +70,16 @@ export default function About() {
 
   useEffect(() => {
     const id = window.setInterval(() => {
-      setActiveSlide((current) => (current + 1) % heroSlides.length);
+      setHeroState((current) => {
+        const nextSlide = (current.activeSlide + 1) % heroSlides.length;
+
+        return {
+          activeSlide: nextSlide,
+          slideImages: current.slideImages.map((image, index) =>
+            index === nextSlide ? pickRandomAboutHeroImage(heroImageCandidates.current, image) : image
+          ),
+        };
+      });
     }, 3600);
 
     return () => window.clearInterval(id);
@@ -87,7 +100,15 @@ export default function About() {
             }}
             transition={{ duration: 1.05, ease: [0.76, 0, 0.24, 1] }}
           >
-            <Image src={slide.image} alt={slide.title} fill priority={index === 0} sizes="100vw" className="object-cover object-[50%_38%]" />
+            <Image
+              src={slideImages[index] ?? heroImageCandidates.current[0]}
+              alt={slide.title}
+              fill
+              priority={index === 0}
+              sizes="100vw"
+              className="object-cover object-center"
+              unoptimized={isSupabaseStorageUrl(slideImages[index])}
+            />
           </motion.div>
         ))}
         <div className="absolute inset-0 bg-black/42" />
@@ -100,7 +121,7 @@ export default function About() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.9, ease: [0.22, 1, 0.36, 1] }}
           >
-            <p className="sow-kicker-on-image mb-7">Profile</p>
+            <p className="sow-kicker-on-image mb-7">About</p>
             <motion.h1
               key={heroSlides[activeSlide].title}
               className="mx-auto max-w-[10ch] break-keep text-[clamp(4.8rem,12vw,12rem)] font-medium leading-[0.86] tracking-[-0.07em]"
@@ -128,7 +149,14 @@ export default function About() {
               key={slide.title}
               type="button"
               aria-label={`${slide.title} 보기`}
-              onClick={() => setActiveSlide(index)}
+              onClick={() =>
+                setHeroState((current) => ({
+                  activeSlide: index,
+                  slideImages: current.slideImages.map((image, imageIndex) =>
+                    imageIndex === index ? pickRandomAboutHeroImage(heroImageCandidates.current, image) : image
+                  ),
+                }))
+              }
               className="relative h-[2px] w-12 overflow-hidden bg-white/28"
             >
               <motion.span

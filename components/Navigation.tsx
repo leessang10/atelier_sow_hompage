@@ -6,7 +6,7 @@ import { usePathname } from 'next/navigation';
 import { useRef, useState } from 'react';
 
 const menuItems = [
-  { href: '/about', text: 'Profile' },
+  { href: '/about', text: 'About' },
   { href: '/contact', text: 'Contact' },
 ];
 
